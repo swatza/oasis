@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Testing of WebSocket Server</title>
+	<!--<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/test_print.css">
+	<link rel="stylesheet" href="css/leaflet.css">
+		<style>
+	        body {
+	            padding: 0;
+	            margin: 0;
+	        }
+	        html, body {
+	            height: 100%;
+	            width: 100%;
+	        }
+	         #mapid {
+
+	            height: 100%;
+	            width: 100%;
+	            
+	         }
+		</style>
+	<!-- Import a general set of JS -->
+	<script src="js/leaflet.js"></script>
+	<script src="js/leaflet.rotatedMarker.js"></script>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/leaflet-arrows.js"></script>
+	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+	<script src="js/ie10-viewport-bug-workaround.js"></script>
+	<script src="js/plotly_latest_min.js"></script>
+</head>
+<body>
+
+	<div id="Header">
+		<table width = "100%" border="0">
+			<tr>
+				<td><img src="images/recuv_logo2.png" width=200></td>
+				<td align=center><font size = "10"> <b> Test Page<!--Online Autonomy & Science Interface System (OASIS)--></b></font></td>
+				<td align=right> <button class="button" onClick="manageServer();" id="server_button" value="Start">Start</button>
+				</br> Status: <span id="ServerStatus" type="text" value="off"/><br/> </td>
+			</tr>
+		</table>
+	</div>
+
+<!-- <div class="container">
+	<h2> Plotting Test</h2>
+	<hr>
+	<TABLE style="width:100%; height:95%" border=1>
+		<TR>
+			<TD style="height:400px;width:60%">
+				<div id="mapid"></div>
+			</TD>
+			<TD valign=top>
+				<span style="display: inline-block;" id='plot_1'></span>
+			</TD>
+			<TD>
+				<span style="display: inline-block;" id='plot_2'></span>
+			</TD>
+		</TR>
+	</TABLE>
+	<hr>
+  </div> -->
+  
+  <!--<div id="ProgramStatus">
+	  <table width = "100%" border = "0">
+	    <tr>
+		  <td> <button class="button" onClick="manageServer();" id="server_button" value="Start">Start</button> </td>
+		  <td> Status: <span id="message"></span> </td>
+		  <td> Connection: <span id="message_conn"></span> </td>
+		</tr>
+	  </table>
+	</div>-->
+	
+	<div id="ScienceTabs" class = "tab">
+	  <button class="tablinks" onclick="openMainTab(event, 'visualizer')" id="defaultOpen">Visualizer</button>
+	  <button class="tablinks" onclick="openMainTab(event, 'commands')">Commands</button>
+	</div>
+  
+  <div id = "Content">
+	  <table style="width:100%; height:95%" border = 1>
+	    <tr>
+		  <td style = "height:600px;width:50%">
+	        <div id ="mapid"></div>
+		  </td>
+		  <td valign=top style="height:50%;width:50%">
+		    <div id="visualizer" class="maintabcontent">
+			  <span onclick="this.parentElement.style.display='none'" class="topright">x</span>
+			    <button class="accordion">Aircraft 1</button>
+				<div class="panel">
+				  <table width=100% class="tabelle separate" s>
+				    <button class="accordionMini">General Info</button>
+					<div class = "panel">
+					  <span id="acdata_1" style="display:none" valign="top" align=center nowrap></span>
+					</div>
+					<button class="accordionMini">Comm Plots</button>
+					<div class="panel">
+					  <span style="display: inline-block;" id="accommplot_1"></span>
+					</div>
+					<button class="accordionMini">Sensor Plots</button>
+					<div class="panel">
+					  <span style="display: inline-block;" id="acsensorplot_1"></span>
+					</div>
+				  </table>
+				</div>
+				<button class="accordion">Aircraft 2</button>
+				<div class="panel">
+				  <table width=100% class="tabelle separate" s>
+				    <button class="accordionMini">General Info</button>
+					<div class = "panel">
+					  <span id="acdata_1" style="display:none" valign="top" align=center nowrap></span>
+					</div>
+					<button class="accordionMini">Comm Plots</button>
+					<div class="panel">
+					  <span style="display: inline-block;" id="accommplot_2"></span>
+					</div>
+					<button class="accordionMini">Sensor Plots</button>
+					<div class="panel">
+					  <span style="display: inline-block;" id="acsensorplot_2"></span>
+					</div>
+				  </table>
+				</div>
+				<button class="accordion">Aircraft 3</button>
+				<div class="panel">
+				  <table width=100% class="tabelle separate" s>
+				    <button class="accordionMini">General Info</button>
+					<div class = "panel">
+					  <span id="acdata_1" style="display:none" valign="top" align=center nowrap></span>
+					</div>
+					<button class="accordionMini">Comm Plots</button>
+					<div class="panel">
+					  <span style="display: inline-block;" id="accommplot_3"></span>
+					</div>
+					<button class="accordionMini">Sensor Plots</button>
+					<div class="panel">
+					  <span style="display: inline-block;" id="acsensorplot_3"></span>
+					</div>
+				  </table>
+				</div>
+				
+				<!-- Insert Other ACCORDION tabs Here -->
+				
+			</div>
+			<!-- Insert other Page Tabs -->
+			<div id="commands" class="maintabcontent">
+			  <span onclick="this.parentElement.style.display='none'" class="topright">x</span>
+			  <h3> Example of the Commands Tab </h3>
+			  <p> Work in Progress </p>
+			</div>
+		  </td>
+		</tr>
+	  </table>
+	</div>
+  
+  
+  
+  <!------------------>
+  <!-- Java Scripts -->
+  <!------------------>
+  <script>
+		var acc = document.getElementsByClassName("accordion");
+		var i;
+		//THIS IS FOR THE ACCORDION AIRCRAFT TABS
+		for (i = 0; i < acc.length; i++) {
+		    acc[i].onclick = function(){
+		        /* Toggle between adding and removing the "active" class,
+		        to highlight the button that controls the panel */
+		        this.classList.toggle("active");
+
+		        /* Toggle between hiding and showing the active panel */
+		        var panel = this.nextElementSibling;
+		        if (panel.style.display === "block") {
+		            panel.style.display = "none";
+		        } else {
+		            panel.style.display = "block";
+		        }
+		    }
+		} 
+		
+		var accMini = document.getElementsByClassName("accordionMini");
+		var i;
+		//THIS IS FOR THE ACCORDION AIRCRAFT TABS
+		for (i = 0; i < accMini.length; i++) {
+		    accMini[i].onclick = function(){
+		        /* Toggle between adding and removing the "active" class,
+		        to highlight the button that controls the panel */
+		        this.classList.toggle("active");
+
+		        /* Toggle between hiding and showing the active panel */
+		        var panel = this.nextElementSibling;
+		        if (panel.style.display === "block") {
+		            panel.style.display = "none";
+		        } else {
+		            panel.style.display = "block";
+		        }
+		    }
+		} 
+
+		function openMainTab(evt, tabName) {
+			//Declare all variables
+			var i, tabcontent, tablinks;
+			
+			//get all elements with class="tabcontent" and hide them
+			tabcontent = document.getElementsByClassName("maintabcontent");
+			for (i=0; i < tabcontent.length; i++) {
+				tabcontent[i].style.display = "none";
+			}
+			
+			//get all elements with class="tablinks" and remove the class "active"
+			tablinks = document.getElementsByClassName("tablinks");
+			for (i=0; i < tablinks.length; i++) {
+				tablinks[i].className = tablinks[i].className.replace(" active", "");
+			}
+			
+			//Show current tab and add an active class to the button that opened the tab
+			document.getElementById(tabName).style.display = "block";
+			evt.currentTarget.className += " active";
+		}
+		//Set the default window to be Visualizer
+		document.getElementById("defaultOpen").click();
+	</script>
+  
+	<script>
+		var map = L.map('mapid').setView([40.145289, -105.247178], 10);
+		if((window.location.search.substring(0)).search('avChart') > 0) {
+			L.tileLayer('http://wms.chartbundle.com/tms/1.0.0/sec/{z}/{x}/{y}.png?type=google').addTo(map)
+		} else {
+			L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic2JvcmVuc3RlaW4iLCJhIjoiY2oydG1rcmx3MDBibzJxczNhcXMwdTQ0NCJ9.yNu8frc3Y9KukxQcnTa6oA').addTo(map);
+		} 
+		var videoUrl = 'https://www.mapbox.com/bites/00188/patricia_nasa.webm',
+			videoBounds = [[ 32, -130], [ 13, -100]];
+		L.VideoOverlay(videoUrl, videoBounds ).addTo(map);
+	</script>
+  
+  <script>
+    var host = window.location.host;
+	var ws;
+    //var ws = new WebSocket('ws://'+host+'/ws');
+    var $message = $('#ServerStatus');
+	
+	function manageServer(){
+	  //Starts the websocket part of the server
+	  if (document.getElementById('server_button').innerHTML == "Start"){
+	    ws = new WebSocket('ws://'+host+'/ws');
+	    document.getElementById('server_button').innerHTML="Stop";
+		
+		 ws.onopen = function(){
+		  $message.attr("class", 'label label-success');
+		  $message.text('open');
+		  ws.send("Start_Stream");
+		};
+		ws.onmessage = function(ev){
+		  var json = JSON.parse(ev.data);
+		  updateMarkers(json)
+		};
+		ws.onclose = function(ev){
+		  $message.attr("class", 'label label-important');
+		  $message.text('closed');
+		};
+		ws.onerror = function(ev){
+		  $message.attr("class", 'label label-warning');
+		  $message.text('error occurred');
+		};
+	  }
+	  else {
+	    ws.close();
+	    document.getElementById('server_button').innerHTML="Start";
+	  }
+	}
+	
+	function updateMarkers(jData){
+		var AC_trig_list = [];
+		var AC_List = document.getElementsByClassName("accordion");
+		var ac_id;
+		for (ac_id = 0; ac_id < AC_List.length; ac_id++){
+			if(AC_List[ac_id].nextElementSibling.style.display === "block"){
+				//Update Plots	
+				plotName = "accommplot_" + (ac_id+1);
+				plot_data_comm[ac_id][0].y.push(jData.AC[ac_id].C);
+				plot_data_comm[ac_id][0].y.shift();
+				Plotly.redraw(plotName,plot_data_comm[ac_id]);
+				
+				plotName = "acsensorplot_" + (ac_id+1);
+				plot_data_sensor[ac_id][0].y.push(jData.AC[ac_id].S);
+				plot_data_sensor[ac_id][0].y.shift();
+				Plotly.redraw(plotName,plot_data_sensor[ac_id]);
+			}
+		}
+	}
+	
+	//Create the plot format
+	var layout = {
+		height: 50,
+		width: 200,
+		yaxis: {
+			tickfont: {
+				family: 'Courier New, monospace',
+				size: 8,
+				color: '#7f7f7f'
+			},
+			autorange: false,
+			range: [0, 10]
+		},
+		margin: {
+			l: 30,
+			r: 0,
+			b: 0,
+			t: 0,
+			pad: 0
+		},
+		hidesources: true
+	};
+	
+	//Instantiate the Plot data
+	var plot_data_comm = new Array(3);
+	var plot_data_sensor = new Array(3);
+	
+	for (i=0; i<3; i++){
+		plot_data_comm[i] = [{
+			x: new Array(120),
+			y: new Array(120),
+			type: 'scatter',
+			line: {color: '#ff0000'},
+			title: 'alt'
+		}];
+		plot_data_sensor[i] = [{
+			x: new Array(120),
+			y: new Array(120),
+			type: 'scatter',
+			line: {color: '#ff0000'},
+			title: 'alt'
+		}];
+
+		for (j=0; j<120; j++){
+			plot_data_comm[i][0].y[j] = 0.0;
+			plot_data_comm[i][0].x[j] = j+1;
+			plot_data_sensor[i][0].y[j] = 0.0;
+			plot_data_sensor[i][0].x[j] = j+1;
+		}
+	}
+	//Define the Plots
+	Plotly.newPlot('accommplot_1',plot_data_comm[0],layout,{staticPlot: true});
+	Plotly.newPlot('acsensorplot_1',plot_data_sensor[0],layout,{staticPlot: true});
+	Plotly.newPlot('accommplot_2',plot_data_comm[1],layout,{staticPlot: true});
+	Plotly.newPlot('acsensorplot_2',plot_data_sensor[1],layout,{staticPlot: true});
+	Plotly.newPlot('accommplot_3',plot_data_comm[2],layout,{staticPlot: true});
+	Plotly.newPlot('acsensorplot_3',plot_data_sensor[2],layout,{staticPlot: true});
+	
+
+  </script>
+</body>
+</html>
