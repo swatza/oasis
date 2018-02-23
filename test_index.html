@@ -233,10 +233,15 @@
 		} 
 		var videoUrl = 'https://www.mapbox.com/bites/00188/patricia_nasa.webm',
 			videoBounds = [[ 32, -130], [ 13, -100]];
-		L.VideoOverlay(videoUrl, videoBounds ).addTo(map);
-	</script>
-  
-  <script>
+		
+		markers = new L.LayerGroup().addTo(map);
+		var planeIcon = L.icon({
+			iconUrl: 'images/plane.png',
+			iconSize: [40,40],
+			iconAnchor: [20,20],
+			popupAnchor: [0,-40]
+		});
+		
     var host = window.location.host;
 	var ws;
     //var ws = new WebSocket('ws://'+host+'/ws');
@@ -254,6 +259,7 @@
 		  ws.send("Start_Stream");
 		};
 		ws.onmessage = function(ev){
+		  var geojson = new L.geoJson(jQuery.parseJSON(ev.data)
 		  var json = JSON.parse(ev.data);
 		  updateMarkers(json)
 		};
@@ -273,6 +279,7 @@
 	}
 	
 	function updateMarkers(jData){
+		var acMarker = [];
 		var AC_trig_list = [];
 		var AC_List = document.getElementsByClassName("accordion");
 		var ac_id;
@@ -290,6 +297,10 @@
 				Plotly.redraw(plotName,plot_data_sensor[ac_id]);
 			}
 		}
+		
+		//Add "aircraft to map"
+		acMarker = L.marker([jData.locaation.lat,jData.location.lon],{icon: planeIcon, rotationAngle: jData.course}).addTo(markers).bindTooltip("Balloon_" + jData.id, {permanent: true, direction: 'top', opacity: .7});
+		
 	}
 	
 	//Create the plot format
