@@ -259,7 +259,7 @@
 		  ws.send("Start_Stream");
 		};
 		ws.onmessage = function(ev){
-		  var geojson = new L.geoJson(jQuery.parseJSON(ev.data)
+		  //var geojson = new L.geoJson(jQuery.parseJSON(ev.data)
 		  var json = JSON.parse(ev.data);
 		  updateMarkers(json)
 		};
@@ -283,6 +283,7 @@
 		var AC_trig_list = [];
 		var AC_List = document.getElementsByClassName("accordion");
 		var ac_id;
+		/**
 		for (ac_id = 0; ac_id < AC_List.length; ac_id++){
 			if(AC_List[ac_id].nextElementSibling.style.display === "block"){
 				//Update Plots	
@@ -296,10 +297,10 @@
 				plot_data_sensor[ac_id][0].y.shift();
 				Plotly.redraw(plotName,plot_data_sensor[ac_id]);
 			}
-		}
+		} **/
 		
 		//Add "aircraft to map"
-		acMarker = L.marker([jData.locaation.lat,jData.location.lon],{icon: planeIcon, rotationAngle: jData.course}).addTo(markers).bindTooltip("Balloon_" + jData.id, {permanent: true, direction: 'top', opacity: .7});
+		acMarker = L.marker([jData.B[0].location.lat,jData.B[0].location.lon],{icon: planeIcon, rotationAngle: jData.B[0].course}).addTo(markers).bindTooltip("Balloon_" + jData.B[0].id, {permanent: true, direction: 'top', opacity: .7});
 		
 	}
 	

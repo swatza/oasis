@@ -1,9 +1,11 @@
 #!/usr/env/python
+import Data_Stream as ds
 from tornado import websocket, web, ioloop
 import json
 import time
 import sys
 import threading
+import serial
 
 cl = []
 msg_cl = []
@@ -69,6 +71,14 @@ class ServerThread(threading.Thread):
 class PublishingThread(threading.Thread):
 	def __init__(self):
 		threading.Thread.__init__(self)
+		self.ds_obj = ds.DataStream()
+		self.ser = serial.Serial()
+		self.ser.port = '/dev/ttyS3' #might change this? 
+		try:
+			self.ser.open()
+		except serial.SerialException:
+				self.ser.close()
+				self.ser.open()
 		print 'Started Publishing Thread'
 		
 	#Change this loop
@@ -80,15 +90,17 @@ class PublishingThread(threading.Thread):
 				p1 = 0
 			p2 = 10 - p1
 			data = {"AC": [{"C":p1, "S":p2},{"C":7, "S":3},{"C":5, "S":5}]}
+			data_2 = self.ds_obj.CalcData(self.ser)
 			#data = {"C": p1, "S": p2}
 			#data = {"P1": p1, "P2": p2}
-			data = json.dumps(data)
-			if msg_cl:
-				for c in msg_cl:
-					c.write_message(data)
-					
-				#sleep for some time
-				print 'Sent Message'
+			if data_2: 
+				#data = json.dumps(data_2)
+				print 'This is gonna be the json string'
+				print data_2
+				if msg_cl:
+					for c in msg_cl:
+						c.write_message(data_2)
+						print 'Sent Message'
 			time.sleep(1)
 		print 'Stopping Publishing Thread'
 			
