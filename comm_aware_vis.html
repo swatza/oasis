@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Testing of WebSocket Server</title>
+	<!--<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/test_print.css">
+	<link rel="stylesheet" href="css/leaflet.css">
+		<style>
+	        body {
+	            padding: 0;
+	            margin: 0;
+	        }
+	        html, body {
+	            height: 100%;
+	            width: 100%;
+	        }
+	         #mapid {
+
+	            height: 100%;
+	            width: 100%;
+	            
+	         }
+			 /* Common button styles */
+	        .button {
+	           border-top: 1px solid #96d1f8;
+	           background: #65a9d7;
+	           background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#65a9d7));
+	           background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
+	           background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+	           background: -ms-linear-gradient(top, #3e779d, #65a9d7);
+	           background: -o-linear-gradient(top, #3e779d, #65a9d7);
+	           padding: 5px 5px;
+	           -webkit-border-radius: 7px;
+	           -moz-border-radius: 7px;
+	           border-radius: 7px;
+	           -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+	           -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+	           box-shadow: rgba(0,0,0,1) 0 1px 0;
+	           text-shadow: rgba(0,0,0,.4) 0 1px 0;
+	           color: white;
+	           font-size: 9px;
+	           font-family: Helvetica, Arial, Sans-Serif;
+	           text-decoration: none;
+	           vertical-align: middle;
+	           width: 80px; 
+	           max-height: 20px;
+	           }
+	        .button:hover {
+	           border-top-color: #28597a;
+	           background: #28597a;
+	           color: #ccc;
+	           }
+	        .button:active {
+	           border-top-color: #1b435e;
+	           background: #1b435e;
+	           }
+	           
+	        .tabelle {
+	            border-collapse: collapse; 
+	        }
+	        .zelle{
+	            padding: 3px; 
+	            background-color: LightYellow; 
+	            font-family: Verdana; 
+	            font-size: 10px;
+	            text-align: center; 
+	            color: Black; 
+	        }
+	        th {
+	            background-color: SteelBlue;
+	            padding: 3px; 
+	            color: White; 
+	            font-size: 10px;
+	            font-family: Verdana; 
+	        }
+	        .separate {
+	            border-radius: 10px;
+	            border-spacing: 0;
+	            border-collapse: separate;
+	        }
+	        .separate td, table.separate th {
+	            border-bottom: 1px solid Gray;
+	            border-right: 1px solid Gray;
+	            padding: 3px; 
+	        }
+	        .separate tr:last-child td:first-child {
+	            border-bottom-left-radius: 10px;
+	        }
+	        .separate tr:last-child td:last-child {
+	            border-bottom-right-radius: 10px;
+	        }
+	        .separate tr th:first-child, table.separate tr td:first-child {
+	            border-left: 1px solid Gray;
+	        }
+	        .separate tr:first-child th, table.separate tr:first-child td {
+	            border-top: 1px solid Gray;
+	        }
+	        .separate tr:first-child th:first-child, table.separate tr:first-child td:first-child {
+	            border-top-left-radius: 10px
+	        }
+	        .separate tr:first-child th:last-child, table.separate tr:first-child td:last-child {
+	            border-top-right-radius: 10px;	
+	        }
+	                   
+	                   
+	        }
+	        
+	        
+	        
+	        
+	        /* Dropdown Button */
+	        .dropbtn {
+	            background-color: #4CAF50;
+	            color: white;
+	            padding: 16px;
+	            font-size: 16px;
+	            border: none;
+	            cursor: pointer;
+	            
+	        }
+
+	        /* The container <div> - needed to position the dropdown content */
+	        .dropdown {
+	            position: relative;
+	            display: inline-block;
+	            width: 100px; 
+	            max-height: 20px;
+	            border-top: 1px solid #96d1f8;
+	           background: #65a9d7;
+	           background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#65a9d7));
+	           background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
+	           background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+	           background: -ms-linear-gradient(top, #3e779d, #65a9d7);
+	           background: -o-linear-gradient(top, #3e779d, #65a9d7);
+	           padding: 5px 5px;
+	           -webkit-border-radius: 7px;
+	           -moz-border-radius: 7px;
+	           border-radius: 7px;
+	           -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+	           -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+	           box-shadow: rgba(0,0,0,1) 0 1px 0;
+	           text-shadow: rgba(0,0,0,.4) 0 1px 0;
+	           color: white;
+	           font-size: 10px;
+	           font-family: Helvetica, Arial, Sans-Serif;
+	           text-decoration: none;
+	           vertical-align: middle;
+	        }
+
+	        /* Dropdown Content (Hidden by Default) */
+	        .dropdown-content {
+	            display: none;
+	            position: absolute;
+	            background-color: #f9f9f9;
+	            min-width: 160px;
+	            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	            z-index: 1;
+	        }
+
+	        /* Links inside the dropdown */
+	        .dropdown-content a {
+	            color: black;
+	            padding: 12px 16px;
+	            text-decoration: none;
+	            display: block;
+	        }
+
+	        /* Change color of dropdown links on hover */
+	        .dropdown-content a:hover {background-color: #f1f1f1}
+
+	        /* Show the dropdown menu on hover */
+	        .dropdown:hover .dropdown-content {
+	            display: block;
+	        }
+
+	        /* Change the background color of the dropdown button when the dropdown content is shown */
+	        .dropdown:hover .dropbtn {
+	            background-color: #3e8e41;
+	        }
+		</style>
+	<!-- Import a general set of JS -->
+	<script src="js/leaflet.js"></script>
+	<script src="js/leaflet.rotatedMarker.js"></script>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/leaflet-arrows.js"></script>
+	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+	<script src="js/ie10-viewport-bug-workaround.js"></script>
+	<script src="js/plotly_latest_min.js"></script>
+</head>
+<body>
+
+	<div id="Header">
+		<table width = "100%" border="0">
+			<tr>
+				<td><img src="images/recuv_logo2.png" width=200></td>
+				<td align=center><font size = "10"> <b> Test Page<!--Online Autonomy & Science Interface System (OASIS)--></b></font></td>
+				<td align=right> <button class="button" onClick="manageServer();" id="server_button" value="Start">Start</button>
+				<br> Status: <span id="ServerStatus" type="text" value="off"></span><br/> </td>
+			</tr>
+		</table>
+	</div>
+	
+	<div id="Content Tabs">
+		<button class="tablinks" onclick="openMainTab(event, 'Visualizing')" id="defaultOpen">Visualizing</button>
+		<button class="tablinks" onclick="openMainTab(event, 'Control')">Control</button>
+		<button class="tablinks" onclick="openMainTab(event, 'Network')">Network</button>
+	</div>
+	
+	<div id = "Content">
+		<table style = "width:100%;height:95%" border = 1>
+			<tr>
+				<td style = "height:800px;width:50%">
+					<div id ="mapid"></div>
+				  </td>
+				<td valign=top style="height:800px;width:50%">
+					<!-- THIS IS A TAB -->
+					<div id = "Control" class="maintabcontent">
+						<h2> Operations Control </h2>
+						<p> Input Stationary Node Locations </p>
+						<p> Will NEED TO ADD SOMETHING FOR THE VEHICLE'S ADDRESS/ETC for SSH</p>
+						<form>
+							GCS Location:<br>
+							<input type="text" name="gcs" value="lat,lon">
+							<br>
+							Transmitter Node Location 1:<br>
+							<input type="text" name="node1" value="lat,lon">
+							<br>
+							Transmitter Node Location 2:<br>
+							<input type="text" name="node2" value="lat,lon">
+							<br>
+							Transmitter Node Location 3:<br>
+							<input type="text" name="node3" value="lat,lon">
+							<br>
+						</form>
+						<p> Mission Type </p>
+						<select id="OperationalModes">
+							<option value="LawnMower">LawnMower</option>
+							<option value="Naive">Naive Approach</option>
+							<option value="Simple">Simple Mission</option>
+							<option value="Triangle">Triangle Mission</option>
+						</select>
+						<p> Max Mission Time </p>
+						<select id="MissionTime">
+							<option value=5>5 Minutess</option>
+							<option value=10>10 Minutes</option>
+							<option value=15>15 Minutes</option>
+							<option value=20>20 Minutes</option>
+						</select> 
+						<p>Logger Mode</p> 
+						<select id="LoggerMode">
+							<option value="Debug">Debug Mode</option>
+							<option value="Run">Run Mode</option>
+						</select>
+						<!-- NEED LINE BREAKS HERE FOR BUTTONS AND STUFF -->
+						<button class="ControlButtons" onclick="startSystemCheck(event)">System Check</button>
+						<button class="ControlButtons" onclick="controlMission(event)" id="mission_button">Start Mission</button>
+					</div>
+					<!-- THIS IS A TAB -->
+					<div id = "Visualizing" class="maintabcontent">
+						<table width=100% class="tabelle separate">
+							<tr>
+								<th>Aircraft Visualization </th>
+							</tr>
+							<tr>
+								<td><button class="VisualButtons" onclick="saveData(event)" id="save_button">Save Data</button></td>
+							</tr>
+							<tr>
+								<td id = "ac_data"></td>
+							</tr>
+							<tr>
+								<td> 
+									<span style="display: inline-block;padding-left:100px; padding-right:100px;" id="position_plot" style="width:50%;"></span>
+									<span style="display: inline-block;padding-left:100px; padding-right:100px;" id="orientation_plot" style="width:50%;"></span>
+								</td>
+							</tr>
+							<tr>
+								<td id = "ac_rf_data"></td>
+							</tr>
+							<tr>
+								<td>
+									<table>
+										<tr>
+											<td> <span style="display: inline-block;padding-left:100px; padding-right:100px;" id="RF_measured_plot"></span> 
+											</td>
+											<td><span style="display: inline-block;padding-left:100px; padding-right:100px;" id="RF_prediction_plot"></span>
+											</td>
+										</tr>
+									</table>
+								</td>
+								<!--
+								<td id="RF_measured_plot">
+									<!--<span style="display: inline-block;" id="RF_measured_plot"></span> 
+									<!--<span style="display: inline-block;" id="RF_prediction_plot"></span> 
+								</td>
+								<td id="RF_prediction_plot">
+								</td> -->
+							</tr>
+							<tr>
+								<td id ="ac_mapping"></td>
+							</tr>
+						</table>
+					</div>
+					<!-- THIS IS A TAB -->
+					<div id = "Network" class="maintabcontent">
+						<h2> Network Visualization </h2>
+						<div id="NMSelector">
+						</div>
+						<button class="NetworkButtons" onclick="saveData(event)" id="save_button_network">Save Data</button>
+						<div id="NetworkInfo">
+						</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	
+	<script>
+		//-----------------------------------
+		// Gets the Network Manager from the Select Tool 
+		//-----------------------------------
+		function getNetworkManagerFromSelector(){
+			//Get the Network Manager Selector
+			var form = document.getElementById("NetworkManagers");
+			var strUser = form.options[form.selectedIndex].value;
+			//Now return the value we grabbed
+			return strUser;
+		}
+		
+		//-----------------------------------
+		//Populates the select element for NM 
+		//-----------------------------------
+		function populateNetworkSelector(list_of_nm){
+			var i;
+			//How are we going to identifiy the network managers? Their ID?
+			//loop through the NM
+			for (i = 0; i < list_of_nm.length; i++){
+				var o = document.createElement("OPTION");
+				o.setAttribute("value", "NM:AC10"); //the value grabbed from the selector
+				var t = document.createTextNode("NM: AC10"); //the name displayed to the user
+				o.appendChild(t);
+				form.appendChild(o);
+			}
+			//Add form to body using pure javascript
+			document.getElementById('NMSelector').appendChild(form);
+		}
+		//-----------------------------------
+		//Creates the Main Tab contents and hides the rest
+		//-----------------------------------
+		function openMainTab(evt, tabName){
+			//declare all variables
+			var i, tabcontent, tablinks;
+			
+			//get all elements with class="tabcontent" and hide them
+			tabcontent = document.getElementsByClassName("maintabcontent");
+			for (i =0; i < tabcontent.length; i++){
+				tabcontent[i].style.display = "none";
+			}
+			
+			//get all elements with class tablinks" and remove the class "active"
+			tablinks = document.getElementsByClassName("tablinks");
+			for (i=0; i < tablinks.length; i++){
+				tablinks[i].className = tablinks[i].className.replace(" active", "");
+			}
+			
+			//show current tab and add an active class to the button that opened the tab
+			document.getElementById(tabName).style.display = "block";
+			evt.currentTarget.className += " active";
+		}
+		//Set the default window
+		document.getElementById("defaultOpen").click();
+		
+		//-----------------------------------
+		// Control buttons
+		//-----------------------------------
+		function controlMission(evt){
+			//Start or Stop the mission 
+			if (document.getElementById('mission_button').innerHTML == "Start Mission"){
+				//Get the logger mode, operation, and mission timer
+				var f1 = document.getElementById('OperationalModes');
+				var str1 = f1.options[f1.selectedIndex].value;
+				var f2 = document.getElementById('MissionTime');
+				var str2 = f2.options[f2.selectedIndex].value;
+				var f3 = document.getElementById('LoggerMode');
+				var str3 = f3.options[f3.selectedIndex].value;
+				//Turn into one message
+				//TODO! Update this part of the string to include username and password of target vehicle
+				var strout = "Start_Mission," + str1 +","+ str2 +"," + str3;
+				//Send to ground station (parse by ",")
+				ws.send(strout);
+				//Update the button
+				document.getElementById('mission_button').innerHTML = "Stop Mission";
+			}
+			else{
+				ws.send("Stop_Mission");
+				//Update the Button
+				document.getElementById('mission_button').innerHTML = "Start Mission";
+			}
+			
+		}
+		
+		function startSystemCheck(evt){
+			//perform a system checkout
+			//If system is running; cannot do this 
+			//Send a message to the server to do a system checkout
+			if (Mode == 3){
+				//Running a mission
+				//Can't do the checkout at this time
+			}
+			//In standby Mode
+			else if (Mode == 1){
+				ws.send("System_Checkout");
+				//Create a popup message saying "Waiting for Results"
+			}
+			//Else is still running checkout or Webserver not on
+			else{
+			
+			}
+		}
+		
+		//-----------------------------------
+		// Visualization buttons
+		//-----------------------------------
+		function saveData(evt){
+			//Get the text from the button
+			if(document.getElementById('save_button').innerHTML == "Save Data"){
+				//Start Saving
+				ws.send("StartSaving");
+				//Change the button
+				document.getElementById('save_button').innerHTML = "Stop Saving";
+				document.getElementById('save_button_network').innerHTML = "Stop Saving";
+			}
+			else{
+				ws.send("StopSaving");
+				document.getElementById('save_button').innerHTML = "Save Data";
+				document.getElementById('save_button_network').innerHTML = "Save Data";
+			}
+		}
+		
+		//-----------------------------------
+		var host = window.location.host;
+		var Mode = 0;
+		var ws;
+		var $message = $('#ServerStatus');
+		//-----------------------------------
+		// Function for managing webserver connections
+		//-----------------------------------
+		function manageServer(){
+			//Starts the websocket part of the server
+			if (document.getElementById('server_button').innerHTML == "Start"){
+				ws = new WebSocket('ws://'+host+'/ws');
+				document.getElementById('server_button').innerHTML="Stop";
+				Mode = 1; //web server is on
+				
+				ws.onopen = function(){
+					$message.attr("class",'label label-success');
+					$message.text('open');
+					ws.send("Start_Stream");
+				};
+				ws.onmessage = function(ev){
+					var json = JSON.parse(ev.data);
+					console.log("We have recieved a Json String");
+					parseNormalMsg(json);
+					//When we recieve a message from the server
+					/*
+					if (Mode == 2){
+						parseCheckOut(json);
+					}
+					else{
+						parseNormalMsg(json);
+					}
+					*/
+					//Parse the System_Checkout
+					//if it isn't in checkout mode
+						//assume normal messages
+					//else assume checkout message
+					
+					
+				};
+				ws.onclose = function(ev){
+					$message.attr("class", 'label label-important');
+					$message.text('closed');
+				};
+				ws.onerror = function(ev){
+					$message.attr("class", 'label label-warning');
+					$message.text('error occurred');
+					Mode = 0; //web server is off
+				};
+			}
+			else{
+				ws.close();
+				document.getElementById('server_button').innerHTML="Start";
+				Mode = 0; //Web server is off
+			}
+		}
+		//-----------------------------------
+		//  Message Parsing Functions
+		//-----------------------------------
+		function parseNormalMsg(jdata){
+			//Function to parse the normal message
+			//if Network Manager Msg exists
+			if (jdata.hasOwnProperty("NMStatus")){
+				console.log("We are processing the NMStatus")
+				//update the NMStatus
+				document.getElementById("NetworkInfo").innerHTML = jDataToHTML_NW(jdata.NMStatus);
+			}
+			//if Aircraft data exists
+			if (jdata.hasOwnProperty("AircraftPixhawkState")){
+				console.log("We are processing the Aircraft State")
+				//update those strings and plots
+				document.getElementById("ac_data").innerHTML = jDataToHTML_AC(jdata.AircraftPixhawkState);
+				//update markers on map
+				updateMarkers(jdata.AircraftPixhawkState);
+				updateAircraftPlots(jdata.AircraftPixhawkState);
+			}
+			//if sensor data exists
+			if (jdata.hasOwnProperty("RF_Data_Msg")){
+				console.log("We are processing the RF Data")
+				//update those strings and plots
+				document.getElementById("ac_rf_data").innerHTML = jDataToHTML_RF_Data(jdata.RF_Data_Msg);
+				//UPDATE PLOTS
+				updateRFPlots(jdata.RF_Data_Msg);
+			}
+			//if gp map data exists
+			if (jdata.hasOwnProperty("RF_PL_Map_Msg")){
+				console.log("We are processing the RF AircrafT Map");
+				document.getElementById("ac_mapping").innerHTML = jDataToHTML_RF_Map(jdata.RF_PL_Map_Msg);
+			}
+		}
+		
+		function updateMarkers(jdata){
+			//Function to update the markers on the map 
+			markers.clearLayers(); //clear all markers
+			//Update AC marker
+			acMarker = L.marker([jdata.LLAPos.x,jdata.LLAPos.y],{icon: planeIcon, rotationAngle: jdata.attitude.z*180/3.1415}).addTo(markers);
+			//Update waypointIcon
+			console.log('About to plot waypoint')
+			if (jdata.hasOwnProperty("currentWaypoint")){
+				waypointMarker = L.marker([jdata.currentWaypoint.LLAPos.x, jdata.currentWaypoint.LLAPos.y],{icon: waypointIcon}).addTo(markers);
+			}
+			//Update GCS marker
+			//addGCSMarker();
+			//Update Node marker
+			//addNodeMarkers();
+			//Update AC Trail
+			console.log("Updating Trail")
+			acTrail = updateTrail(acTrail, [jdata.LLAPos.x,jdata.LLAPos.y]);
+			//Update AC Poly
+			console.log("Drawing Polyline for trail")
+			acPoly = L.polyline(acTrail,{color:'blue'}).addTo(markers);
+		}
+		
+		function addGCSMarker(){
+			//Grab from Form of GCS location
+			//var str = $('form').serialize() //this produces "bar=xxx&"
+			var formElements = documents.getElementById("locationForm").elements;
+			//use the position to update the location
+			var substr = formElements[0].value;
+			//Split string
+			var splitstr = substr.split(",");
+			//Parse into floats
+			var lat = parseFloat(splitstr[0]);
+			var lon = parseFloat(splitstr[1]);
+			gcsMarker = L.marker([lat,lon],{icon: gcsIcon, rotatedAngle: 0}).addTo(markers);
+		}
+		
+		function addNodeMarkers(){
+			//Grab from Form of Node Locations
+			//var str = $('form').serializeArray() //this produces [{"name":"gcs","value":"lat,lon"}, {....}]
+			var formElements = documents.getElementById("locationForm").elements;
+			//parse the message
+			//use the position to update the location
+			var substr = formElements[1].value;
+			//Split string
+			var splitstr = substr.split(",");
+			//Parse into floats
+			var lat = parseFloat(splitstr[0]);
+			var lon = parseFloat(splitstr[1]);
+			nodeMarker[0] = L.marker([lat,lon],{icon: transmitterIcon}).addTo(markers);
+			//use the position to update the location
+			var substr = formElements[2].value;
+			//Split string
+			var splitstr = substr.split(",");
+			//Parse into floats
+			var lat = parseFloat(splitstr[0]);
+			var lon = parseFloat(splitstr[1]);
+			nodeMarker[1] = L.marker([lat,lon],{icon: transmitterIcon}).addTo(markers);
+			//use the position to update the location
+			var substr = formElements[3].value;
+			//Split string
+			var splitstr = substr.split(",");
+			//Parse into floats
+			var lat = parseFloat(splitstr[0]);
+			var lon = parseFloat(splitstr[1]);
+			nodeMarker[2] = L.marker([lat,lon],{icon: transmitterIcon}).addTo(markers);
+		}
+		
+		function updateTrail(inTrail, latlng){
+			if(inTrail.length >= 50){
+				inTrail.pop();
+			}
+			inTrail.unshift(latlng);
+			return inTrail;
+		}
+		
+		function updateAircraftPlots(jdata){
+			/*
+			plotName = "position_plot";
+			ac_enu_pos[0][0].y.push(jdata.position.east);
+			ac_enu_pos[0][0].y.shift();
+			ac_enu_pos[0][1].y.push(jdata.position.north);
+			ac_enu_pos[0][1].y.shift();
+			ac_enu_pos[0][2].y.push(jdata.position.up); //DO WE WANT THE UP PART OF THE PLOT?
+			ac_enu_pos[0][2].y.shift();
+			Plotly.redraw(plotName,ac_enu_pos[0]); */
+			
+			plotName = "orientation_plot";
+			ac_ori[0][0].y.push(jdata.attitude.roll);
+			ac_ori[0][0].y.shift();
+			ac_ori[0][1].y.push(jdata.attitude.pitch);
+			ac_ori[0][1].y.shift();
+			ac_ori[0][2].y.push(jdata.attitude.yaw);
+			ac_ori[0][2].y.shift();
+			Plotly.redraw(plotName,ac_ori[0]);
+		}
+		
+		function updateRFPlots(jdata){
+			plotName = "RF_measured_plot";
+			rf_rssi[0][0].y.push(jdata.rfNode[0].rssi);
+			rf_rssi[0][0].y.shift();
+			rf_rssi[0][1].y.push(jdata.rfNode[1].rssi);
+			rf_rssi[0][1].y.shift();
+			rf_rssi[0][2].y.push(jdata.rfNode[2].rssi);
+			rf_rssi[0][2].y.shift();
+			Plotly.redraw(plotName,rf_rssi[0]);
+			
+			plotName = "RF_prediction_plot";
+			rf_pred_err[0][0].y.push(jdata.rfNode[0].pred_err);
+			rf_pred_err[0][0].y.shift();
+			rf_pred_err[0][1].y.push(jdata.rfNode[1].pred_err);
+			rf_pred_err[0][1].y.shift();
+			rf_pred_err[0][2].y.push(jdata.rfNode[2].pred_err);
+			rf_pred_err[0][2].y.shift();
+			Plotly.redraw(plotName,rf_pred_err[0]);
+		}
+		
+		function parseCheckOut(){
+			//TODO! 
+			//Create a pop up message with the results
+			
+			//Throw an error if there was no returns within timeout (5s?)
+		}
+		
+		
+		//-----------------------------------
+		// The Map Overlay
+		//-----------------------------------
+		var map = L.map('mapid').setView([40.145289, -105.247178], 10);
+		//TODO: Update this part for background of map button
+		if((window.location.search.substring(0)).search('avChart') > 0) {
+			L.tileLayer('http://wms.chartbundle.com/tms/1.0.0/sec/{z}/{x}/{y}.png?type=google').addTo(map);
+		} else {
+			L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic2JvcmVuc3RlaW4iLCJhIjoiY2oydG1rcmx3MDBibzJxczNhcXMwdTQ0NCJ9.yNu8frc3Y9KukxQcnTa6oA').addTo(map);
+		} 
+		
+		markers = new L.LayerGroup().addTo(map);
+		
+		//Markers
+		var acMarker = [];
+		var nodeMarker = [];
+		var gcsMarker = [];
+		var acPoly = [];
+		var acTrail = [];
+		
+		//-----------------------------------
+		// Icons for the Map
+		//-----------------------------------
+		var planeIcon = L.icon({
+			iconUrl: 'images/plane.png',
+			iconSize: [40,40],
+			iconAnchor: [20,20],
+			popupAnchor: [0,-40]
+		});
+		var gcsIcon = L.icon({
+			iconUrl: 'images/ground_station.png',
+			iconSize: [40,40],
+			iconAnchor: [20,20]
+		});
+		var transmitterIcon = L.icon({
+			iconUrl: 'images/beacon_icon.png',
+			iconSize: [40,40],
+			iconAnchor: [20,20]
+		});
+		var waypointIcon = L.icon({
+			iconUrl: 'images/icon_waypoint.png',
+			iconSize: [40,40],
+			iconAnchor: [20,20]
+		});
+		
+		//-----------------------------------
+		// JSON to HTML Formatting
+		//-----------------------------------
+		function getFixed(data, digits) {
+			if ((typeof data !== 'undefined') && data != null) {
+				return data.toFixed(digits);
+			} else {
+				return -1;
+			}
+		}
+		
+		function jDataToHTML_AC(jData){
+			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Aircraft:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.ID + "</TD>"; //Aircraft ID
+			oStr += "<TH style=\"width:150px;\" nowrap>Aircraft:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.packetNum + "</TD>"; //Aircraft ID
+			oStr += "<TD style=\"width:150px;\"></TD><TD style=\"width:150px;\"></TD>"; //Blank Space
+			oStr += "<TD style=\"width:150px;\"></TD><TD style=\"width:150px;\"></TD>"; //Blank Space
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Mode:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.mode + "</TD>"; //Pixhawk Mode
+			oStr += "<TH style=\"width:150px;\" nowrap>Status:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap> TODO! </TD>"; //Status (Standby, Checkedout, Running)
+			oStr += "<TH style=\"width:150px;\" nowrap>Mission Mode:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap> TODO! </TD>"; //What Mission
+			oStr += "<TH style=\"width:150px;\" nowrap>Mission Time:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap> TODO! </TD>"; //Mission time
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Battery Voltage:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.batteryStatus.voltage,2) + "</TD>"; //Battery Voltage
+			oStr += "<TH style=\"width:150px;\" nowrap>Battery Current:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.batteryStatus.current,2) + "</TD>"; //Battery Current
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Lat:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.LLAPos.x,4) + "</TD>"; //Aircraft Lat
+			oStr += "<TH style=\"width:150px;\" nowrap>Lon:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.LLAPos.y,4) + "</TD>"; //Aircraft Lat
+			oStr += "<TH style=\"width:150px;\" nowrap>Altitude:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.LLAPos.z,2) + "</TD>"; //Altitude (ASL or AGL?)
+			oStr += "<TH style=\"width:150px;\" nowrap>Airspeed:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.airspeed,2) + "</TD>"; //Airspeed
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Roll:</TH><TD class=\" zelle\" style=\"width:100px;\" nowrap>" + getFixed(jData.attitude.x*180/3.1415,2) + "</TD>"; //Roll
+			oStr += "<TH style=\" width:150px;\" nowrap>Pitch:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.attitude.y*180/3.1415, 2) + "</TD>"; //Pitch
+			oStr += "<TH style=\" width:150px;\" nowrap>Yaw:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.attitude.z *180/3.1415, 2) + "</TD>"; //Yaw
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "</TR></TABLE>"; 
+			
+			return oStr;
+		}
+		
+		function jDataToHTML_AC_TEST(){	
+			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Aircraft:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "Talon 50" + "</TD>"; //Aircraft ID
+			oStr += "<TD style=\"width:150px;\"></TD><TD style=\"width:150px;\"></TD>"; //Blank Space
+			oStr += "<TD style=\"width:150px;\"></TD><TD style=\"width:150px;\"></TD>"; //Blank Space
+			oStr += "<TD style=\"width:150px;\"></TD><TD style=\"width:150px;\"></TD>"; //Blank Space
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Mode:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "Auto" + "</TD>"; //Pixhawk Mode
+			oStr += "<TH style=\"width:150px;\" nowrap>Status:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap> TODO! </TD>"; //Status (Standby, Checkedout, Running)
+			oStr += "<TH style=\"width:150px;\" nowrap>Mission Mode:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap> TODO! </TD>"; //What Mission
+			oStr += "<TH style=\"width:150px;\" nowrap>Mission Time:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap> TODO! </TD>"; //Mission time
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Battery Voltage:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "11.5" + "</TD>"; //Battery Voltage
+			oStr += "<TH style=\"width:150px;\" nowrap>Battery Current:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "4.2" + "</TD>"; //Battery Current
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Lat:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "40.0152" + "</TD>"; //Aircraft Lat
+			oStr += "<TH style=\"width:150px;\" nowrap>Lon:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "-105.2893" + "</TD>"; //Aircraft Lat
+			oStr += "<TH style=\"width:150px;\" nowrap>Altitude:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "198.02" + "</TD>"; //Altitude (ASL or AGL?)
+			oStr += "<TH style=\"width:150px;\" nowrap>Airspeed:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "15.20" + "</TD>"; //Airspeed
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Roll:</TH><TD class=\" zelle\" style=\"width:100px;\" nowrap>" + "29.83" + "</TD>"; //Roll
+			oStr += "<TH style=\" width:150px;\" nowrap>Pitch:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + "01.45" + "</TD>"; //Pitch
+			oStr += "<TH style=\" width:150px;\" nowrap>Yaw:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + "134.00" + "</TD>"; //Yaw
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "</TR></TABLE>"; 
+			return oStr;
+		}
+		
+		function jDataToHTML_RF_Data(jData){
+			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			oStr += "<TH style=\" width:150px;\" nowrap>Packet Count</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + "5 Hz" + "</TD>"; //Measurement Rate
+			oStr += "<TH style=\" width:150px;\" nowrap>CH1</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.rfNode[0].rssi,2) + "</TD>"; //Measurement From CH1 
+			oStr += "<TH style=\" width:150px;\" nowrap>CH2</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.rfNode[1].rssi,2) + "</TD>"; //Measurement From CH2
+			oStr += "<TH style=\" width:150px;\" nowrap>CH3</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.rfNode[2].rssi,2) + "</TD>"; //Measurement From CH3
+			oStr += "</TR></TR>"
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "<TH style=\" width:150px;\" nowrap>PL Error CH1: </TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.rfNode[0].pl_error,2) + "</TD>"; //Measurement From CH1 
+			oStr += "<TH style=\" width:150px;\" nowrap>PL Error CH2: </TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.rfNode[1].pl_error,2) + "</TD>"; //Measurement From CH2
+			oStr += "<TH style=\" width:150px;\" nowrap>PL Error CH3: </TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.rfNode[2].pl_error,2) + "</TD>"; //Measurement From CH3
+			oStr += "</TR></TABLE>";
+			return oStr;
+		}
+		
+		function jDataToHTML_RF_Data_TEST(jData){
+			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			oStr += "<TH style=\" width:150px;\" nowrap>Measurement Rate: </TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + "5Hz" + "</TD>"; //Measurement Rate
+			oStr += "<TH style=\" width:150px;\" nowrap>RSSI CH1: </TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + "-29.45" + "</TD>"; //Measurement From CH1 
+			oStr += "<TH style=\" width:150px;\" nowrap>RSSI CH2: </TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + "-80.49" + "</TD>"; //Measurement From CH2
+			oStr += "<TH style=\" width:150px;\" nowrap>RSSI CH3: </TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + "-101.31" + "</TD>"; //Measurement From CH3
+			oStr += "</TR></TR>"
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "<TH style=\" width:150px;\" nowrap>PL Error CH1: </TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + "12" + "</TD>"; //Measurement From CH1 
+			oStr += "<TH style=\" width:150px;\" nowrap>PL Error CH2: </TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + "-14.83" + "</TD>"; //Measurement From CH2
+			oStr += "<TH style=\" width:150px;\" nowrap>PL Error CH3: </TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + "-3.19" + "</TD>"; //Measurement From CH3
+			oStr += "</TR></TABLE>";	
+			return oStr;
+		}
+		
+		function jDataToHTML_RF_Map(jData){
+			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>GP Iteration Number:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.gp_iteration_number + "</TD>"; //GP Map Iteration
+			oStr += "<TH style=\"width:150px;\" nowrap>Total Waypoint Cost:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.bestLocation.cost + "</TD>"; //Waypoint Cost
+			oStr += "<TH style=\"width:150px;\" nowrap>Cost From Node A:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.costFromA + "</TD>"; //Cost from Node A
+			oStr += "<TH style=\"width:150px;\" nowrap>Cost From Node B:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.costFromB + "</TD>"; //Cost from Node B 
+			oStr += "</TR></TABLE>";
+			return oStr;
+		}
+		
+		function jDataToHTML_RF_Map_TEST(jData){
+			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>GP Iteration Number:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "5" + "</TD>"; //GP Map Iteration
+			oStr += "<TH style=\"width:150px;\" nowrap>Total Waypoint Cost:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "403.43" + "</TD>"; //Waypoint Cost
+			oStr += "<TH style=\"width:150px;\" nowrap>Cost From Node A:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "201.31" + "</TD>"; //Cost from Node A
+			oStr += "<TH style=\"width:150px;\" nowrap>Cost From Node B:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "202.12" + "</TD>"; //Cost from Node B 
+			oStr += "</TR></TABLE>";
+			return oStr;
+		}
+		
+		function jDataToHTML_NW(jData){
+			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap> NWManager ID: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.ID + "</TD>"; //Network Manager Platform / ID
+			oStr += "<TH style=\"width:150px;\" nowrap> Msgs in Que: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.messagesInQue + "</TD>"; //Que Size
+			oStr += "<TH style=\"width:150px;\" nowrap> Avg Time Delay: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.avgTimeDelay*1000,2) + "</TD>"; //Avg Msg Delay
+			oStr += "<TH style=\"width:150px;\" nowrap> # Local Subscribers: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.numberOfLocalSubscribers + "</TD>"; //Number of Local Subscribers
+			oStr += "<TH style=\"width:150px;\" nowrap> # Global Subscribers: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.numberOfGlobalSubscribers + "</TD>"; //Number of All Subscribers
+			oStr += "</TR></TABLE>";
+			oStr += "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			//Now loop through subscribers
+			for(var i =0; i < jData.numberOfLocalSubscribers; i++){
+				data = jData.subs[i];
+				//For each subscriber
+				oStr += "<TH style=\"width:100px;\" nowrap>Subscriber #: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + i + "</TD>"; //Subscriber ID
+				oStr += "<TH style=\"width:100px;\" nowrap>ID: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + data.id + "</TD>"; //Subscriber ID
+				oStr += "<TH style=\"width:100px;\" nowrap>Data Type: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + data.datatype + "</TD>"; //Subscriber Data Type
+				oStr += "<TH style=\"width:100px;\" nowrap>Msg Rate: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + data.msgfreq + "</TD>"; //Subscriber Data Rate
+				oStr += "<TH style=\"width:100px;\" nowrap>IP: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + data.address + "</TD>"; //Subscriber IP
+				oStr += "<TH style=\"width:100px;\" nowrap>Port:  </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + data.port + "</TD>"; //Subscriber Port
+				oStr += "</TR><TR>"
+			}
+			//End of loop
+			oStr += "</TR></TABLE>";
+			return oStr;
+		}
+		
+		function jDataToHTML_NW_TEST(){
+			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>NWManager ID: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "CC01" + "</TD>"; //Network Manager Platform / ID
+			oStr += "<TH style=\"width:150px;\" nowrap>Msgs in Que: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "2" + "</TD>"; //Que Size
+			oStr += "<TH style=\"width:150px;\" nowrap>Avg Time Delay: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "2.91 ms" + "</TD>"; //Avg Msg Delay
+			oStr += "<TH style=\"width:150px;\" nowrap># Local Subscribers: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "3" + "</TD>"; //Number of Local Subscribers
+			oStr += "<TH style=\"width:150px;\" nowrap># Global Subscribers: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "5" + "</TD>"; //Number of All Subscribers
+			oStr += "</TR></TABLE>";
+			oStr += "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			//Now loop through subscribers
+			for(var i =0; i < 3; i++){
+				//For each subscriber
+				oStr += "<TH style=\"width:100px;\" nowrap>Subscriber # </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + i + "</TD>"; //Subscriber Num
+				oStr += "<TH style=\"width:100px;\" nowrap>ID: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "AC10" + "</TD>"; //Subscriber ID
+				oStr += "<TH style=\"width:100px;\" nowrap>Data Type: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "State" + "</TD>"; //Subscriber Data Type
+				oStr += "<TH style=\"width:100px;\" nowrap>Msg Rate: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "5Hz" + "</TD>"; //Subscriber Data Rate
+				oStr += "<TH style=\"width:100px;\" nowrap>IP:  </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "192.158.32.42" + "</TD>"; //Subscriber IP
+				oStr += "<TH style=\"width:100px;\" nowrap>Port: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "10000" + "</TD>"; //Subscriber Port
+				oStr += "</TR><TR>"
+			}
+			//End of loop
+			oStr += "</TR></TABLE>";
+			return oStr;
+		}
+		
+		//TEMPORARY AUTO GENERATE THE JDATA TEXT
+		/*
+		document.getElementById("ac_data").innerHTML = jDataToHTML_AC_TEST();
+		document.getElementById("ac_rf_data").innerHTML = jDataToHTML_RF_Data_TEST();
+		document.getElementById("ac_mapping").innerHTML = jDataToHTML_RF_Map_TEST();
+		document.getElementById("NetworkInfo").innerHTML = jDataToHTML_NW_TEST(); */
+		
+		
+		//-----------------------------------
+		// Instantiate Plots
+		//-----------------------------------
+		//Set the three colors 
+		var color3 = '#0000cc'; //Blue
+		var color2 = '#cc0000'; //Red
+		var color1 = '#00cc00'; //Green
+		
+		//Layout
+		var layout = {
+			height: 200,
+			width: 250,
+			yaxis: {
+				tickfont: {
+					family: 'Courier New, monospace',
+					size: 8,
+					color: '#7f7f7f'
+				}
+			},
+			margin: {
+				l: 30,
+				r: 0,
+				b: 0,
+				t: 0,
+				pad: 0
+			},
+			hidesources: true
+
+		};
+		
+		//Initialize the array values for the plots
+		var rf_rssi = new Array(1); //For each channel 
+		var rf_pred_err = new Array(1); //for each channel 
+		var ac_enu_pos = new Array(1);
+		var ac_ori = new Array(1);
+		for (i=0;i<1;i++){
+			rf_rssi[i] = [{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#00cc00'} 
+			},
+			{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#cc0000'} 
+			}, 			
+			{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#0000cc'}
+			}];
+			rf_pred_err[i] = [{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#00cc00'} 
+			},
+			{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#cc0000'} 
+			}, 			
+			{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#0000cc'}
+			}];
+			ac_enu_pos[i] = [{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#00cc00'} 
+			},
+			{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#cc0000'} 
+			}, 			
+			{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#0000cc'}
+			}];
+			ac_ori[i] = [{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#00cc00'} 
+			},
+			{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#cc0000'} 
+			}, 			
+			{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#0000cc'}
+			}];
+			
+			for (j=0; j < 120; j++){
+				//RF Measured
+				rf_rssi[i][0].x[j] = j + 1;
+				rf_rssi[i][0].y[j] = 0.0;
+				rf_rssi[i][1].x[j] = j + 1;
+				rf_rssi[i][1].y[j] = 0.0;
+				rf_rssi[i][2].x[j] = j + 1;
+				rf_rssi[i][2].y[j] = 0.0;
+				//RF Pred
+				rf_pred_err[i][0].x[j] = j + 1;
+				rf_pred_err[i][0].y[j] = 0.0;
+				rf_pred_err[i][1].x[j] = j + 1;
+				rf_pred_err[i][1].y[j] = 0.0;
+				rf_pred_err[i][2].x[j] = j + 1;
+				rf_pred_err[i][2].y[j] = 0.0;
+				//Position
+				ac_enu_pos[i][0].x[j] = j + 1;
+				ac_enu_pos[i][0].y[j] = 0.0;
+				ac_enu_pos[i][1].x[j] = j + 1;
+				ac_enu_pos[i][1].y[j] = 0.0;
+				ac_enu_pos[i][2].x[j] = j + 1;
+				ac_enu_pos[i][2].y[j] = 0.0;
+				//Orientation
+				ac_ori[i][0].x[j] = j + 1;
+				ac_ori[i][0].y[j] = 0.0;
+				ac_ori[i][1].x[j] = j + 1;
+				ac_ori[i][1].y[j] = 0.0;
+				ac_ori[i][2].x[j] = j + 1;
+				ac_ori[i][2].y[j] = 0.0;
+			}
+		}
+		
+		//Instantiate the plots
+		Plotly.newPlot('position_plot', ac_enu_pos,layout,{staticPlot:true});
+		Plotly.newPlot('orientation_plot', ac_ori,layout,{staticPlot:true});
+		Plotly.newPlot('RF_measured_plot', rf_rssi,layout,{staticPlot:true});
+		Plotly.newPlot('RF_prediction_plot', rf_pred_err,layout,{staticPlot:true});
+		//TODO! Will likely need legends for the multiple colored plots
+		
+	</script>
+</body>
+</html>
