@@ -56,6 +56,7 @@ class StreamReaderThread(threading.Thread):
 		
 		#Create the subscriber information to send to the Network Manager
 		self.sub = mysubscriber
+		self.DataType = mysubscriber.TYPE
 			
 		#go ahead and build the subscriber message
 		pkt_id = PyPacket.PacketID(PyPacket.PacketPlatform.SERVER_STATION,00)
@@ -90,25 +91,26 @@ class StreamReaderThread(threading.Thread):
 			readable, writable, exceptional = select.select([socketIn],[socketOut],[socketIn]) #is this the right way?? 
 			for s in readable:
 				#Get data from socket
-				datapkt, address = s.recvfrom(RECV_BUFF)
+				dataPkt, address = s.recvfrom(RECV_BUFF)
 				print >>sys.stderr, 'recieved "%s" from %s' %(len(dataPkt), address)
 				#Assign datapkt as an object
 				newPkt = PyPacket.PyPacket()
 				newPkt.setPacket(dataPkt)
 				#Verify the packet is correct type (unlikely)
-				if(verifyPacketType(newPkt.DataType,self.DataType)):
+				if(verifyPacketType(newPkt.getDataType(),self.DataType)):
 					#yes it is the datatype we want / convert to dictionary (pre-json)
 					pktData = newPkt.getData()
 					#convert to protobuf type
 					datastr = str(pktData)
-					msg, thisType = PyPacket.TypeDictionaryDispatch[self.DataType]
-					msg.parseFromString(datastr)
+					msg, thisType = PyPacket.TypeDictionaryDispatch[str(self.DataType)]()
+					msg.ParseFromString(datastr)
 					#convert to json string
 					json_string = json_format.MessageToJson(msg)
 					#convert back to dictionary
 					dictOut = json.loads(json_string)
 					#put into que
 					self.MyQueue.put([dictOut,thisType]) #could put a time stamp with the dictionary for easy comparison
+					print 'loaded message into que'
 				#End verified loop
 			#end readable
 			for s in writable:

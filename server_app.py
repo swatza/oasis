@@ -8,7 +8,7 @@ import threading
 import Queue
 #import paramiko not installed yet
 
-from multiprocessing import Process, Lock
+from multiprocessing import Process, Lock, Queue
 #import serial
 
 sys.path.insert(0,'../PyUAS') #get the path to the PyUAS Folder
@@ -140,18 +140,15 @@ class PublishingThread(threading.Thread):
 			#	dTime[i] = nowTime - lastTime[i]
 			dTime = nowTime - lastTime 
 			
-			#check for the different frequency sets
-			for i in range(0,len(self.FrequencySets)):
-				if (dTime >= 1/self.FrequencySets[i]):
-					#Do soemthing for this frequency set
-					json_data = ProcessFrequencySet(self.FrequencySets[i],self.FrequencyQues)
-					if json_data:
-						if msg_cl:
-							for c in msg_cl:
-								c.write_message(json_data)
-								print 'sent message'
-					#Now update the last time this frequency set was handled
-					lastTime[i] = time.time()
+			if (dTime >= 1):
+				json_data = ProcessFrequencySet(self.FrequencyQues)
+				if json_data: #always true with new setup
+					if msg_cl:
+						for c in msg_cl:
+							c.write_message(json_data)
+							print 'sent message'
+				#Now update the last time this frequency set was handled
+				lastTime = time.time()
         #End of while loop
 		print 'Stopping Web Publishing Thread'
 
@@ -183,16 +180,17 @@ def run_cmd(host_ip, cmd_list):
     #do stuff here
     pass
 
-def ProcessFrequencySet(frequency, QueList):
+def ProcessFrequencySet(QueList):
 	#grab the top msg from each que in that frequency set
 	outdata = {}
 	for q in QueList:
-		#add logical check for getting no wait (future work)
-		out= q.get() #pop off top msg
-		#How do i check / verify that the time difference between each top msg in the que is not significant
-        msg = out[0]
-        thistype = out[1]
-        outdata[thistype] = msg
+		if not q.empty():
+			#add logical check for getting no wait (future work)
+			out= q.get() #pop off top msg
+			#How do i check / verify that the time difference between each top msg in the que is not significant
+			msg = out[0]
+			thistype = out[1]
+			outdata[thistype] = msg
 	#parse the final dictionary into json
 	return json.dumps(outdata)
 	
@@ -345,6 +343,9 @@ def WebReaderSide(l,QueList):
 	
 	#loop through the stream readers and start each of them
 	srt1.start()
+	srt2.start()
+	srt3.start()
+	srt4.start()
 	
 	while threading.active_count() > 1:
 		try:
@@ -384,7 +385,7 @@ if __name__ == '__main__':
 	#Generate teh Ques
 	AllQueList = []
 	for i in range(4):
-		newQue = Queue.Queue()
+		newQue = Queue()
 		AllQueList.append(newQue)
 	#Generate A bunch of things for the Reader Side
 	pWS = Process(target=WebServerSide, args=(lock,AllQueList))
