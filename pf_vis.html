@@ -258,15 +258,15 @@
 		
 		//Add "True Targets to Map"
 		for (tid = 0; tid < jData.TargetNumber; tid++){
-			targetMarker[tid] = L.marker([jData.Target[tid].location.lat,jData.Target[tid].location.lon],{icon: planeIcon, rotationAngle: 0}).addTo(markers).bindTooltip("Target_" + (tid+1), {permanent: true, direction: 'top', opacity: .7});
+			targetMarker[tid] = L.marker([jData.Target[tid].lat,jData.Target[tid].lon],{icon: planeIcon, rotationAngle: 0}).addTo(markers).bindTooltip("Target_" + (tid+1), {permanent: true, direction: 'top', opacity: .7});
 		} 
 		
 		//Add "GCS" to Map
-		gcsMarker = L.marker([jData.GCS.location.lat,jData.GCS.location.lon],{icon: planeIcon, rotationAngle: 0}).addTo(markers).bindTooltip("GCS",{permanent: true, direction: 'top', opacity: .7}); 
+		gcsMarker = L.marker([jData.GCS.lat,jData.GCS.lon],{icon: planeIcon, rotationAngle: 0}).addTo(markers).bindTooltip("GCS",{permanent: true, direction: 'top', opacity: .7}); 
 		
 		//Add "Particles to Map"
 		 for (psid = 0; psid < jData.TargetNumber; psid++){
-			particleAvg[psid] = L.circleMarker([jData.ParticleSet[psid].avgParticle.location.lat, jData.ParticleSet[psid].avgParticle.location.lon], { renderer: myRenderer, color: color_avg[psid], radius: 8}).addTo(particles);
+			particleAvg[psid] = L.circleMarker([jData.ParticleSet[psid].avgParticle.lat, jData.ParticleSet[psid].avgParticle.lon], { renderer: myRenderer, color: color_avg[psid], radius: 8}).addTo(particles);
 			/**for (pid = 0; pid < jData.ParticleSet[psid].ParticleNumber; pid++){
 				particleMarker[pid] = L.circleMarker(jData.ParticleSet[psid].particle[pid].location.lat,jData.ParticleSet[psid].particle[pid].location.lon],{renderer: myRenderer, color: color_dots[psid], radius: 5}).addTo(particles[curr_p]);
 			} **/
