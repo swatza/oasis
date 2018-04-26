@@ -5,7 +5,21 @@ import json
 import time
 import sys
 import threading
+import Queue
+#import paramiko not installed yet
+
+from multiprocessing import Process, Lock
 #import serial
+
+sys.path.insert(0,'../PyUAS') #get the path to the PyUAS Folder
+sys.path.insert(0,'../PyUAS/protobuf') #get the path to the protobuf format
+import Subscriber
+import PyPacket
+import Server_Reader
+import PyPackets_pb2
+#External Libs
+from google.protobuf import json_format
+#import Server_Reader
 
 cl = []
 msg_cl = []
@@ -14,35 +28,60 @@ shutdown_event = threading.Event()
 class IndexHandler(web.RequestHandler):
 	def get(self):
 		#self.render("test_index.html")
-		self.render("pf_vis.html")
+		self.render("comm_aware_vis.html")
 
 class SocketHandler(websocket.WebSocketHandler):
-	def check_origin(self, origin):
-		return True
+    def check_origin(self, origin):
+        return True
 
-	def open(self):
-		if self not in cl:
-			cl.append(self)
-			print 'Client Connected'
+    def open(self):
+        if self not in cl:
+            cl.append(self)
+            print 'Client Connected'
 
-	def on_close(self):
-		if self in cl:
-			cl.remove(self)	
-			msg_cl.remove(self)
-			print 'Client Disconnected'
-			
-	def on_message(self, message):
-		if message == "Start_Stream":
-			#add this client to receive data updates
-			msg_cl.append(self)
-			print 'Added client to streaming list'
-		elif message == "Stop_Stream":
-			#remove this client from receiving data updates
-			msg_cl.remove(self) 
-			print 'Removed client from streaming list'
-		else:
-			#Not implemented or incorrect message
-			print("Message not understood:" + message)
+    def on_close(self):
+        if self in cl:
+            cl.remove(self)	
+            msg_cl.remove(self)
+            print 'Client Disconnected'
+
+    '''
+    StartSaving:
+    StopSaving:
+    System_Checkout
+    Start_Mission, .... 
+    Stop_Mission
+    '''
+
+    def on_message(self, message):
+        command = message.split(",")[0]
+        if command == "Start_Stream":
+            #add this client to receive data updates
+            msg_cl.append(self)
+            print 'Added client to streaming list'
+        elif command == "Stop_Stream":
+            #remove this client from receiving data updates
+            msg_cl.remove(self) 
+            print 'Removed client from streaming list'
+        elif command == "StartSaving":
+            #Start saving data to a log file
+            setLoggingMode = 1;
+        elif command == "StopSaving":
+            #Stop saving data to a log file
+            setLoggingMode = 0;
+        elif command == "System_Checkout":
+            #Start A System Checkout
+            SystemCheckout();
+        elif command == "Start_Mission":
+            #Start the Mission
+            startMission(message)
+        elif command == "Stop_Mission":
+            #Stop the mission
+            stopMission()
+        else:
+            #Not implemented or incorrect message
+            print("Message not understood:" + message)
+
 
 class ApiHandler(web.RequestHandler):
 
@@ -70,48 +109,202 @@ class ServerThread(threading.Thread):
 		self.io_loop.close()
 
 class PublishingThread(threading.Thread):
-	def __init__(self):
-		threading.Thread.__init__(self)
-		print 'Started Publishing Thread'
-		
+    def __init__(self, ques):
+        threading.Thread.__init__(self)
+        print 'Started Publishing Thread'
+        self.FrequencySets = [1] #list of frequencies
+        self.FrequencyQues = ques #a list of que lists 
+
 	#Change this loop
-	def run(self):
-		tnum = 3;
-		lat0 =40.0071697
-		lon0 =-105.2649012
-		lat1 =39.956742
-		lon1 =-105.166978
-		lat2 =40.0405096
-		lon2 =-105.2110949
-		lat3 =39.9950224
-		lon3 =-105.1599398
-		latA =40.0008086
-		lonA =-105.217618
-		latB =39.9743796
-		lonB =-105.2673482
-		latC =40.040606
-		lonC =-105.273153
-		#data = {"AC": [{"C":p1, "S":p2},{"C":7, "S":3},{"C":5, "S":5}]}
-		data = {"TargetNumber": tnum} 
-		data1 = {"Target": [{"location": {"lat": lat1, "lon":lon1}},{"location": {"lat": lat2, "lon":lon2}},{"location": {"lat": lat3, "lon":lon3}}]}
-		data2 = {"GCS": {"location": {"lat": lat0, "lon":lon0}}}
-		data3 = {"ParticleSet": [{"avgParticle": {"location": {"lat": latA, "lon":lonA}}},{"avgParticle": {"location": {"lat": latB, "lon":lonB}}},{"avgParticle": {"location": {"lat": latC, "lon":lonC}}}]}
-		for d in (data1,data2, data3):
-			data.update(d)
-		#d4 = dict(data.items() + data2.items() + data3.items())
+    def run(self):
+		'''
+        #Keep running until we want to shutdown
+        while not shutdown_event.is_set():
+            json_data = createTestJson()
+            if json_data:
+                #print json_data
+                if msg_cl:
+                    for c in msg_cl:
+					    print('Sent Message')
+					    c.write_message(json_data)
+            time.sleep(.5) 
+		'''
+        
+		#NEED TO STILL INITIALIZE THESE
+		lastTime = time.time() #size of frequency sets
+		dTime = time.time() #size of frequency sets
 		while not shutdown_event.is_set():
-			if data: 
-				#data = json.dumps(data_2)
-				data_out = json.dumps(data)
-				#print(data_out)
-				#print(data['TargetNumber'])
-				if msg_cl:
-					for c in msg_cl:
-						c.write_message(data_out)
-						print 'Sent Message'
-			time.sleep(1)
-		print 'Stopping Publishing Thread'
+			#need to get the dT
+			nowTime = time.time()
+			#for i in range(0,len(lastTime)):
+			#	dTime[i] = nowTime - lastTime[i]
+			dTime = nowTime - lastTime 
 			
+			#check for the different frequency sets
+			for i in range(0,len(self.FrequencySets)):
+				if (dTime >= 1/self.FrequencySets[i]):
+					#Do soemthing for this frequency set
+					json_data = ProcessFrequencySet(self.FrequencySets[i],self.FrequencyQues)
+					if json_data:
+						if msg_cl:
+							for c in msg_cl:
+								c.write_message(json_data)
+								print 'sent message'
+					#Now update the last time this frequency set was handled
+					lastTime[i] = time.time()
+        #End of while loop
+		print 'Stopping Web Publishing Thread'
+
+def SystemCheckout():
+    #DO stuff here 
+    pass
+
+def startMission(mission_string):
+    #Do stuff here
+    pass
+    stringList = mission_string.split(",") #Cmd, Username, Pwd, Mission, Time, Logger
+    systemName = stringList[1]
+    pwd = stringList[2]
+    #ssh to the vehicle and perform the action
+    ssh = paramiko.SSHClient()
+    ssh.connect(server, username=systemName, password=pwd)
+    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd_to_execute)
+    #Need some try/exception lists for password etc
+    #Might recommend making a function for just running a command given host and command
+
+    #When finished
+    ssh.close() #close the ssh connection
+    
+def stopMission():
+    #Do stuff here
+    pass
+
+def run_cmd(host_ip, cmd_list):
+    #do stuff here
+    pass
+
+def ProcessFrequencySet(frequency, QueList):
+	#grab the top msg from each que in that frequency set
+	outdata = {}
+	for q in QueList:
+		#add logical check for getting no wait (future work)
+		out= q.get() #pop off top msg
+		#How do i check / verify that the time difference between each top msg in the que is not significant
+        msg = out[0]
+        thistype = out[1]
+        outdata[thistype] = msg
+	#parse the final dictionary into json
+	return json.dumps(outdata)
+	
+
+def createTestJson():
+    #Hard Code some json strings
+    #Msg4 Aircraft State
+    msg4 = PyPackets_pb2.AircraftPixhawkState()
+    msg4.packetNum = 1;
+    msg4.ID = "Test"
+    msg4.time = time.time()
+    msg4.LLA_Pos.x = 40.014984
+    msg4.LLA_Pos.y = -105.270546
+    msg4.LLA_Pos.z = 100 #AGL
+    msg4.velocity.x = 10
+    msg4.velocity.y = 0
+    msg4.velocity.z = 0
+    msg4.attitude.x = 0
+    msg4.attitude.y = 0
+    msg4.attitude.z = 0
+    msg4.airspeed = 15
+    msg4.mode = "IDK"
+    msg4.batteryStatus.current = 10
+    msg4.batteryStatus.voltage = 11.7
+    msg4.currentWaypoint.LLA_Pos.x = 40.000267
+    msg4.currentWaypoint.LLA_Pos.y = -105.100021
+    msg4.currentWaypoint.LLA_Pos.z = 100
+    #Msg3 NM Status
+    msg3 = PyPackets_pb2.NMStatus()
+    msg3.packetNum = 1
+    msg3.ID = "Test"
+    msg3.time = time.time()
+    msg3.numberOfMsgs = 10
+    msg3.avgTimeDelay = 5
+    msg3.totalMsgsRcv = 100
+    for i in range(3):
+        new = msg3.subs.add()
+        new.id = "sub"
+        new.datatype = "AC10"
+        new.port = 10000
+        new.address = "192.158.10.101"
+        new.msgfreq = 0.1
+
+    msg3.messagesInQue = 12
+    msg3.numberOfLocalSubscribers = 3
+    msg3.numberOfGlobalSubscribers = 0
+    #Msg2 RF Sensor
+    msg2 = PyPackets_pb2.RF_Data_Msg()
+    msg2.packetNum = 1
+    msg2.ID = "test"
+    msg2.time = time.time()
+    msg2.lla.x = 40.1
+    msg2.lla.y = 100.0
+    msg2.lla.z = 90
+    msg2.attitude.x = 0
+    msg2.attitude.y = 0
+    msg2.attitude.z = 0
+    msg2.airspeed = 1
+    for i in range(3):
+        new = msg2.rfNode.add()
+        new.chanID = "1"
+        new.rssi = 10
+        new.pl_msr = 5
+        new.pl_error = 0
+        new.xgridNum
+    #Msg1 RF Map
+    msg1 = PyPackets_pb2.RF_PL_Map_Msg()
+    msg1.packetNum = 1
+    msg1.ID = "test"
+    msg1.time = time.time()
+    msg1.gp_iteration_number = 1
+    msg1.xGrids = 1
+    msg1.yGrids = 1
+    msg1.xSpacing = 1
+    msg1.ySpacing = 1
+    for i in range(4):
+        new = msg1.cell.add()
+        new.xgridNum = 10
+        new.ygridNum = 15
+        new.est_path_loss = 5
+        new.path_loss_err = 1
+        new.pred_path_loss = 2
+    
+    msg1.centerPoint.x = 40.389
+    msg1.centerPoint.y = -105.39
+    msg1.centerPoint.z = 0
+    msg1.gp_learning_time = 10
+    msg1.gp_prediction_time = 12
+    msg1.bestLocation.LLA_Pos.x = 39.742043
+    msg1.bestLocation.LLA_Pos.y = -104.991531
+    msg1.bestLocation.LLA_Pos.z = 0
+    msg1.bestLocation.cost = 100
+    msg1.costFromA = 60
+    msg1.costFromB = 40
+
+    #Serialize and combine
+    json_string = json_format.MessageToJson(msg1)
+    dictOut = json.loads(json_string)
+    json_string = json_format.MessageToJson(msg2)
+    dictOut2 = json.loads(json_string)
+    json_string = json_format.MessageToJson(msg3)
+    dictOut3 = json.loads(json_string)
+    json_string = json_format.MessageToJson(msg4)
+    dictOut4 = json.loads(json_string)
+    
+    dictionaryNew = {}
+    dictionaryNew['AircraftPixhawkState'] = dictOut4
+    dictionaryNew['RF_PL_Map_Msg'] = dictOut
+    dictionaryNew['RF_Data_Msg'] = dictOut2
+    dictionaryNew['NMStatus'] = dictOut3
+    return json.dumps(dictionaryNew)
+
 app = web.Application([
     (r'/', IndexHandler),
     (r'/ws', SocketHandler),
@@ -123,20 +316,78 @@ app = web.Application([
 	(r'/images/(.*)',web.StaticFileHandler, {'path': './images/'}),
 ])
 
-if __name__ == '__main__':
+
+def WebReaderSide(l,QueList):
+	#QueList = [Q1,Q2,Q3,Q4]
+    #Create A set Number of Stream Reader Threads
+	print 'Created WebReaderSide'
+	#List of ports being used
+	ports = [10000,10005,10010,10015]
+	#Create all the subscribers
+	#For Network Manager
+	subNM = Subscriber.Subscriber(PyPacket.PacketDataType.PKT_NETWORK_MANAGER_STATUS,PyPacket.PacketID(PyPacket.PacketPlatform.GROUND_CONTROL_STATION,00).getBytes(),ports[0],'localhost',1)
+	#For Aircraft State
+	subAS = Subscriber.Subscriber(PyPacket.PacketDataType.PKT_AUTOPILOT_PIXHAWK,PyPacket.PacketID(PyPacket.PacketPlatform.AIRCRAFT,10).getBytes(),ports[1],'localhost',1)
+	#For RF Data Msg1
+	subRF = Subscriber.Subscriber(PyPacket.PacketDataType.PKT_RF_DATA_MSG,PyPacket.PacketID(PyPacket.PacketPlatform.AIRCRAFT,10).getBytes(),ports[2],'localhost',1)
+	#For RF PL Map
+	subMP = Subscriber.Subscriber(PyPacket.PacketDataType.PKT_RF_PL_MAP_MSG,PyPacket.PacketID(PyPacket.PacketPlatform.AIRCRAFT,10).getBytes(),ports[3],'localhost',1)
+	
+	StreamReaderThreadList = []
+	srt1 = Server_Reader.StreamReaderThread(subNM,QueList[0],shutdown_event)
+	StreamReaderThreadList.append(srt1)
+	srt2 = Server_Reader.StreamReaderThread(subAS,QueList[1],shutdown_event)
+	StreamReaderThreadList.append(srt2)
+	srt3 = Server_Reader.StreamReaderThread(subRF,QueList[2],shutdown_event)
+	StreamReaderThreadList.append(srt3)
+	srt4 = Server_Reader.StreamReaderThread(subMP,QueList[3],shutdown_event)
+	StreamReaderThreadList.append(srt4)
+	
+	#loop through the stream readers and start each of them
+	srt1.start()
+	
+	while threading.active_count() > 1:
+		try:
+			l.acquire()
+			print 'Running with %s Readers' % len(StreamReaderThreadList)
+			l.release()
+			time.sleep(1)
+		except (KeyboardInterrupt, SystemExit):
+			shutdown_event.set()
+	sys.exit()
+
+def WebServerSide(l,QueList):
+	l.acquire()
+	print 'Created Web Server Side'
+	l.release()
 	app.listen(8888)
 	#start the publishing thread
-	publishingTask = PublishingThread()
+	publishingTask = PublishingThread(QueList)
 	publishingTask.start()
 	#start the IO loop for server side
 	serverTask = ServerThread()
 	serverTask.start()
-	
+
 	while threading.active_count() > 1:
 		try:
+			l.acquire()
 			print 'Running with %s Clients' % len(cl)
+			l.release()
 			time.sleep(1)
 		except (KeyboardInterrupt, SystemExit):
 			shutdown_event.set()
 			serverTask.stop()
 	sys.exit()
+
+if __name__ == '__main__':
+	lock = Lock()
+	#Generate teh Ques
+	AllQueList = []
+	for i in range(4):
+		newQue = Queue.Queue()
+		AllQueList.append(newQue)
+	#Generate A bunch of things for the Reader Side
+	pWS = Process(target=WebServerSide, args=(lock,AllQueList))
+	pWR = Process(target=WebReaderSide, args=(lock,AllQueList))
+	pWS.start()
+	pWR.start()
