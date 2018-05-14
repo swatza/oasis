@@ -26,9 +26,9 @@ msg_cl = []
 shutdown_event = threading.Event()
 
 class IndexHandler(web.RequestHandler):
-	def get(self):
-		#self.render("test_index.html")
-		self.render("weather_vis.html")
+    def get(self):
+        #self.render("test_index.html")
+        self.render("weather_vis.html")
 
 class SocketHandler(websocket.WebSocketHandler):
     def check_origin(self, origin):
@@ -41,7 +41,7 @@ class SocketHandler(websocket.WebSocketHandler):
 
     def on_close(self):
         if self in cl:
-            cl.remove(self)	
+            cl.remove(self)    
             msg_cl.remove(self)
             print 'Client Disconnected'
 
@@ -85,28 +85,28 @@ class SocketHandler(websocket.WebSocketHandler):
 
 class ApiHandler(web.RequestHandler):
 
-	@web.asynchronous
-	def get(self, *args):
-		pass
+    @web.asynchronous
+    def get(self, *args):
+        pass
 
-	@web.asynchronous
-	def post(self):
-		pass
-		
+    @web.asynchronous
+    def post(self):
+        pass
+        
 class ServerThread(threading.Thread):
-	def __init__(self):
-		threading.Thread.__init__(self)
-		print 'Started Server Thread'
-		self.io_loop = ioloop.IOLoop.current()
-		
-	def run(self):
-		self.io_loop.start()
-		
-	def stop(self):
-		print 'Stopping Server Thread'
-		self.io_loop.stop()
-		print 'Closing IO Loop'
-		self.io_loop.close()
+    def __init__(self):
+        threading.Thread.__init__(self)
+        print 'Started Server Thread'
+        self.io_loop = ioloop.IOLoop.current()
+        
+    def run(self):
+        self.io_loop.start()
+        
+    def stop(self):
+        print 'Stopping Server Thread'
+        self.io_loop.stop()
+        print 'Closing IO Loop'
+        self.io_loop.close()
 
 class PublishingThread(threading.Thread):
     def __init__(self, ques):
@@ -115,9 +115,9 @@ class PublishingThread(threading.Thread):
         self.FrequencySets = [1] #list of frequencies
         self.FrequencyQues = ques #a list of que lists 
 
-	#Change this loop
+    #Change this loop
     def run(self):
-		'''
+        '''
         #Keep running until we want to shutdown
         while not shutdown_event.is_set():
             json_data = createTestJson()
@@ -125,32 +125,33 @@ class PublishingThread(threading.Thread):
                 #print json_data
                 if msg_cl:
                     for c in msg_cl:
-					    print('Sent Message')
-					    c.write_message(json_data)
+                        print('Sent Message')
+                        c.write_message(json_data)
             time.sleep(.5) 
-		'''
+        '''
         
-		#NEED TO STILL INITIALIZE THESE
-		lastTime = time.time() #size of frequency sets
-		dTime = time.time() #size of frequency sets
-		while not shutdown_event.is_set():
-			#need to get the dT
-			nowTime = time.time()
-			#for i in range(0,len(lastTime)):
-			#	dTime[i] = nowTime - lastTime[i]
-			dTime = nowTime - lastTime 
-			
-			if (dTime >= 1):
-				json_data = ProcessFrequencySet(self.FrequencyQues)
-				if json_data: #always true with new setup
-					if msg_cl:
-						for c in msg_cl:
-							c.write_message(json_data)
-							print 'sent message'
-				#Now update the last time this frequency set was handled
-				lastTime = time.time()
+        #NEED TO STILL INITIALIZE THESE
+        lastTime = time.time() #size of frequency sets
+        dTime = time.time() #size of frequency sets
+        while not shutdown_event.is_set():
+            #need to get the dT
+            nowTime = time.time()
+            #for i in range(0,len(lastTime)):
+            #    dTime[i] = nowTime - lastTime[i]
+            dTime = nowTime - lastTime 
+            
+            if (dTime >= 1):
+                json_data = ProcessFrequencySet(self.FrequencyQues)
+                if json_data: #always true with new setup
+                    if msg_cl:
+                        for c in msg_cl:
+                            c.write_message(json_data)
+                            print json_data
+                            print 'sent message'
+                #Now update the last time this frequency set was handled
+                lastTime = time.time()
         #End of while loop
-		print 'Stopping Web Publishing Thread'
+        print 'Stopping Web Publishing Thread'
 
 def SystemCheckout():
     #DO stuff here 
@@ -181,19 +182,19 @@ def run_cmd(host_ip, cmd_list):
     pass
 
 def ProcessFrequencySet(QueList):
-	#grab the top msg from each que in that frequency set
-	outdata = {}
-	for q in QueList:
-		if not q.empty():
-			#add logical check for getting no wait (future work)
-			out= q.get() #pop off top msg
-			#How do i check / verify that the time difference between each top msg in the que is not significant
-			msg = out[0]
-			thistype = out[1]
-			outdata[thistype] = msg
-	#parse the final dictionary into json
-	return json.dumps(outdata)
-	
+    #grab the top msg from each que in that frequency set
+    outdata = {}
+    for q in QueList:
+        if not q.empty():
+            #add logical check for getting no wait (future work)
+            out= q.get() #pop off top msg
+            #How do i check / verify that the time difference between each top msg in the que is not significant
+            msg = out[0]
+            thistype = out[1]
+            outdata[thistype] = msg
+    #parse the final dictionary into json
+    return json.dumps(outdata)
+    
 
 def createTestJson():
     #Hard Code some json strings
@@ -309,76 +310,76 @@ app = web.Application([
     (r'/api', ApiHandler),
     (r'/(favicon.ico)', web.StaticFileHandler, {'path': '../'}),
     (r'/(rest_api_example.png)', web.StaticFileHandler, {'path': './'}),
-	(r'/js/(.*)',web.StaticFileHandler, {'path': './js/'}),
-	(r'/css/(.*)',web.StaticFileHandler, {'path': './css/'}),
-	(r'/images/(.*)',web.StaticFileHandler, {'path': './images/'}),
+    (r'/js/(.*)',web.StaticFileHandler, {'path': './js/'}),
+    (r'/css/(.*)',web.StaticFileHandler, {'path': './css/'}),
+    (r'/images/(.*)',web.StaticFileHandler, {'path': './images/'}),
 ])
 
 
 def WebReaderSide(l,QueList):
-	#QueList = [Q1,Q2,Q3,Q4]
+    #QueList = [Q1,Q2,Q3,Q4]
     #Create A set Number of Stream Reader Threads
-	print 'Created WebReaderSide'
-	#List of ports being used
-	ports = [10000,10005,10010,10015]
-	#Create all the subscribers
-	#For Network Manager
-	subNM = Subscriber.Subscriber(PyPacket.PacketDataType.PKT_NETWORK_MANAGER_STATUS,PyPacket.PacketID(PyPacket.PacketPlatform.GROUND_CONTROL_STATION,00).getBytes(),ports[0],'localhost',1)
-	#For Aircraft State
-	subBS = Subscriber.Subscriber(PyPacket.PacketDataType.PKT_BALLOON_SENSOR_SET,PyPacket.PacketID(PyPacket.PacketPlatform.AIRCRAFT,90).getBytes(),ports[1],'localhost',1)
+    print 'Created WebReaderSide'
+    #List of ports being used
+    ports = [10000,10005,10010,10015]
+    #Create all the subscribers
+    #For Network Manager
+    subNM = Subscriber.Subscriber(PyPacket.PacketDataType.PKT_NETWORK_MANAGER_STATUS,PyPacket.PacketID(PyPacket.PacketPlatform.GROUND_CONTROL_STATION,00).getBytes(),ports[0],'localhost',1)
+    #For Aircraft State
+    subBS = Subscriber.Subscriber(PyPacket.PacketDataType.PKT_BALLOON_SENSOR_SET,PyPacket.PacketID(PyPacket.PacketPlatform.AIRCRAFT,90).getBytes(),ports[1],'localhost',1)
 
-	StreamReaderThreadList = []
-	srt1 = Server_Reader.StreamReaderThread(subNM,QueList[0],shutdown_event)
-	StreamReaderThreadList.append(srt1)
-	srt2 = Server_Reader.StreamReaderThread(subBS,QueList[1],shutdown_event)
-	StreamReaderThreadList.append(srt2)
-	
-	#loop through the stream readers and start each of them
-	srt1.start()
-	srt2.start()
-	
-	while threading.active_count() > 1:
-		try:
-			l.acquire()
-			print 'Running with %s Readers' % len(StreamReaderThreadList)
-			l.release()
-			time.sleep(1)
-		except (KeyboardInterrupt, SystemExit):
-			shutdown_event.set()
-	sys.exit()
+    StreamReaderThreadList = []
+    srt1 = Server_Reader.StreamReaderThread(subNM,QueList[0],shutdown_event)
+    StreamReaderThreadList.append(srt1)
+    srt2 = Server_Reader.StreamReaderThread(subBS,QueList[1],shutdown_event)
+    StreamReaderThreadList.append(srt2)
+    
+    #loop through the stream readers and start each of them
+    srt1.start()
+    srt2.start()
+    
+    while threading.active_count() > 1:
+        try:
+            l.acquire()
+            print 'Running with %s Readers' % len(StreamReaderThreadList)
+            l.release()
+            time.sleep(1)
+        except (KeyboardInterrupt, SystemExit):
+            shutdown_event.set()
+    sys.exit()
 
 def WebServerSide(l,QueList):
-	l.acquire()
-	print 'Created Web Server Side'
-	l.release()
-	app.listen(8888)
-	#start the publishing thread
-	publishingTask = PublishingThread(QueList)
-	publishingTask.start()
-	#start the IO loop for server side
-	serverTask = ServerThread()
-	serverTask.start()
+    l.acquire()
+    print 'Created Web Server Side'
+    l.release()
+    app.listen(8888)
+    #start the publishing thread
+    publishingTask = PublishingThread(QueList)
+    publishingTask.start()
+    #start the IO loop for server side
+    serverTask = ServerThread()
+    serverTask.start()
 
-	while threading.active_count() > 1:
-		try:
-			l.acquire()
-			print 'Running with %s Clients' % len(cl)
-			l.release()
-			time.sleep(1)
-		except (KeyboardInterrupt, SystemExit):
-			shutdown_event.set()
-			serverTask.stop()
-	sys.exit()
+    while threading.active_count() > 1:
+        try:
+            l.acquire()
+            print 'Running with %s Clients' % len(cl)
+            l.release()
+            time.sleep(1)
+        except (KeyboardInterrupt, SystemExit):
+            shutdown_event.set()
+            serverTask.stop()
+    sys.exit()
 
 if __name__ == '__main__':
-	lock = Lock()
-	#Generate teh Ques
-	AllQueList = []
-	for i in range(4):
-		newQue = Queue()
-		AllQueList.append(newQue)
-	#Generate A bunch of things for the Reader Side
-	pWS = Process(target=WebServerSide, args=(lock,AllQueList))
-	pWR = Process(target=WebReaderSide, args=(lock,AllQueList))
-	pWS.start()
-	pWR.start()
+    lock = Lock()
+    #Generate teh Ques
+    AllQueList = []
+    for i in range(4):
+        newQue = Queue()
+        AllQueList.append(newQue)
+    #Generate A bunch of things for the Reader Side
+    pWS = Process(target=WebServerSide, args=(lock,AllQueList))
+    pWR = Process(target=WebReaderSide, args=(lock,AllQueList))
+    pWS.start()
+    pWR.start()
