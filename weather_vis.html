@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Online Observation for Autonomous And Scientific Unmanned Systems</title>
+	<!--<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/test_print.css">
+	<link rel="stylesheet" href="css/leaflet.css">
+		<style>
+	        body {
+	            padding: 0;
+	            margin: 0;
+	        }
+	        html, body {
+	            height: 100%;
+	            width: 100%;
+	        }
+	         #mapid {
+
+	            height: 100%;
+	            width: 100%;
+	            
+	         }
+			 /* Common button styles */
+	        .button {
+	           border-top: 1px solid #96d1f8;
+	           background: #65a9d7;
+	           background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#65a9d7));
+	           background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
+	           background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+	           background: -ms-linear-gradient(top, #3e779d, #65a9d7);
+	           background: -o-linear-gradient(top, #3e779d, #65a9d7);
+	           padding: 5px 5px;
+	           -webkit-border-radius: 7px;
+	           -moz-border-radius: 7px;
+	           border-radius: 7px;
+	           -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+	           -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+	           box-shadow: rgba(0,0,0,1) 0 1px 0;
+	           text-shadow: rgba(0,0,0,.4) 0 1px 0;
+	           color: white;
+	           font-size: 9px;
+	           font-family: Helvetica, Arial, Sans-Serif;
+	           text-decoration: none;
+	           vertical-align: middle;
+	           width: 80px; 
+	           max-height: 20px;
+	           }
+	        .button:hover {
+	           border-top-color: #28597a;
+	           background: #28597a;
+	           color: #ccc;
+	           }
+	        .button:active {
+	           border-top-color: #1b435e;
+	           background: #1b435e;
+	           }
+	           
+	        .tabelle {
+	            border-collapse: collapse; 
+	        }
+	        .zelle{
+	            padding: 3px; 
+	            background-color: LightYellow; 
+	            font-family: Verdana; 
+	            font-size: 10px;
+	            text-align: center; 
+	            color: Black; 
+	        }
+	        th {
+	            background-color: SteelBlue;
+	            padding: 3px; 
+	            color: White; 
+	            font-size: 10px;
+	            font-family: Verdana; 
+	        }
+	        .separate {
+	            border-radius: 10px;
+	            border-spacing: 0;
+	            border-collapse: separate;
+	        }
+	        .separate td, table.separate th {
+	            border-bottom: 1px solid Gray;
+	            border-right: 1px solid Gray;
+	            padding: 3px; 
+	        }
+	        .separate tr:last-child td:first-child {
+	            border-bottom-left-radius: 10px;
+	        }
+	        .separate tr:last-child td:last-child {
+	            border-bottom-right-radius: 10px;
+	        }
+	        .separate tr th:first-child, table.separate tr td:first-child {
+	            border-left: 1px solid Gray;
+	        }
+	        .separate tr:first-child th, table.separate tr:first-child td {
+	            border-top: 1px solid Gray;
+	        }
+	        .separate tr:first-child th:first-child, table.separate tr:first-child td:first-child {
+	            border-top-left-radius: 10px
+	        }
+	        .separate tr:first-child th:last-child, table.separate tr:first-child td:last-child {
+	            border-top-right-radius: 10px;	
+	        }
+	                   
+	                   
+	        }
+	              
+	        /* Dropdown Button */
+	        .dropbtn {
+	            background-color: #4CAF50;
+	            color: white;
+	            padding: 16px;
+	            font-size: 16px;
+	            border: none;
+	            cursor: pointer;
+	            
+	        }
+
+	        /* The container <div> - needed to position the dropdown content */
+	        .dropdown {
+	            position: relative;
+	            display: inline-block;
+	            width: 100px; 
+	            max-height: 20px;
+	            border-top: 1px solid #96d1f8;
+	           background: #65a9d7;
+	           background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#65a9d7));
+	           background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
+	           background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+	           background: -ms-linear-gradient(top, #3e779d, #65a9d7);
+	           background: -o-linear-gradient(top, #3e779d, #65a9d7);
+	           padding: 5px 5px;
+	           -webkit-border-radius: 7px;
+	           -moz-border-radius: 7px;
+	           border-radius: 7px;
+	           -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+	           -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+	           box-shadow: rgba(0,0,0,1) 0 1px 0;
+	           text-shadow: rgba(0,0,0,.4) 0 1px 0;
+	           color: white;
+	           font-size: 10px;
+	           font-family: Helvetica, Arial, Sans-Serif;
+	           text-decoration: none;
+	           vertical-align: middle;
+	        }
+
+	        /* Dropdown Content (Hidden by Default) */
+	        .dropdown-content {
+	            display: none;
+	            position: absolute;
+	            background-color: #f9f9f9;
+	            min-width: 160px;
+	            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	            z-index: 1;
+	        }
+
+	        /* Links inside the dropdown */
+	        .dropdown-content a {
+	            color: black;
+	            padding: 12px 16px;
+	            text-decoration: none;
+	            display: block;
+	        }
+
+	        /* Change color of dropdown links on hover */
+	        .dropdown-content a:hover {background-color: #f1f1f1}
+
+	        /* Show the dropdown menu on hover */
+	        .dropdown:hover .dropdown-content {
+	            display: block;
+	        }
+
+	        /* Change the background color of the dropdown button when the dropdown content is shown */
+	        .dropdown:hover .dropbtn {
+	            background-color: #3e8e41;
+	        }
+		</style>
+	<!-- Import a general set of JS -->
+	<script src="js/leaflet.js"></script>
+	<script src="js/leaflet.rotatedMarker.js"></script>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/leaflet-arrows.js"></script>
+	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+	<script src="js/ie10-viewport-bug-workaround.js"></script>
+	<script src="js/plotly_latest_min.js"></script>
+</head>
+<body>
+
+	<div id="Header">
+		<table width = "100%" border="0">
+			<tr>
+				<td><img src="images/recuv_logo2.png" width=200></td>
+				<td align=center><font size = "10"> <b> Weather Visualization<!--Online Autonomy & Science Interface System (OASIS)--></b></font></td>
+				<td align=right> <button class="button" onClick="manageServer();" id="server_button" value="Start">Start</button>
+				<br> Status: <span id="ServerStatus" type="text" value="off"></span><br/> </td>
+			</tr>
+		</table>
+	</div>
+	
+	<div id="Content Tabs">
+		<button class="tablinks" onclick="openMainTab(event, 'Visualizing')" id="defaultOpen">Visualizing</button>
+		<button class="tablinks" onclick="openMainTab(event, 'Control')">Control</button>
+		<button class="tablinks" onclick="openMainTab(event, 'Network')">Network</button>
+	</div>
+	
+	<div id = "Content">
+		<table style = "width:100%;height:95%" border = 1>
+			<tr>
+				<td style = "height:800px;width:50%">
+					<div id ="mapid"></div>
+				  </td>
+				<td valign=top style="height:800px;width:50%">
+					<!-- THIS IS A TAB -->
+					<div id = "Control" class="maintabcontent">
+						<span onclick="this.parentElement.style.display='none'" class="topright">x</span>
+						<h2> Operations Control </h2>
+						<form>
+							Save File Name: 
+							<input type="text" name="savefilename" value="myexamplesavefile"> 
+							<br>
+						</form>
+						<button class="ControlButtons" onclick="RecordData">Start Recording</button> </br>
+					</div>
+					<!-- THIS IS A TAB -->
+					<div id = "Visualizing" class="maintabcontent">
+						<span onclick="this.parentElement.style.display='none'" class="topright">x</span>
+						<h3> Visualizing </h3>
+						<button class="accordion">Balloon 1</button>
+						<div class="panel">
+							<span id="bldata_1" style="display: block" valign="top" align=center nowrap></span>
+							<span style="display: inline-block;" id="blaltitudeplot_1"></span>
+							<span style="display: inline-block;" id="blpressureplot_1"></span>
+							<span style="display: inline-block;" id="bltemperatureplot_1"></span>
+							<span style="display: inline-block;" id="blhumidityplot_1"></span>
+							<span style="display: inline-block;" id="blrssiplot_1"></span>
+						</div>
+						<button class="accordion">Balloon 2</button>
+						<div class="panel">
+							<span id="bldata_2" style="display: block" valign="top" align=center nowrap></span>
+							<span style="display: inline-block;" id="blaltitudeplot_2"></span>
+							<span style="display: inline-block;" id="blpressureplot_2"></span>
+							<span style="display: inline-block;" id="bltemperatureplot_2"></span>
+							<span style="display: inline-block;" id="blhumidityplot_2"></span>
+							<span style="display: inline-block;" id="blrssiplot_2"></span>
+						</div>
+						<button class="accordion">Balloon 3</button>
+						<div class="panel">
+							<span id="bldata_3" style="display: block" valign="top" align=center nowrap></span>
+							<span style="display: inline-block;" id="blaltitudeplot_3"></span>
+							<span style="display: inline-block;" id="blpressureplot_3"></span>
+							<span style="display: inline-block;" id="bltemperatureplot_3"></span>
+							<span style="display: inline-block;" id="blhumidityplot_3"></span>
+							<span style="display: inline-block;" id="blrssiplot_3"></span>
+						</div>
+						<button class="accordion">Balloon 4</button>
+						<div class="panel">
+							<span id="bldata_4" style="display: block" valign="top" align=center nowrap></span>
+							<span style="display: inline-block;" id="blaltitudeplot_4"></span>
+							<span style="display: inline-block;" id="blpressureplot_4"></span>
+							<span style="display: inline-block;" id="bltemperatureplot_4"></span>
+							<span style="display: inline-block;" id="blhumidityplot_4"></span>
+							<span style="display: inline-block;" id="blrssiplot_4"></span>
+						</div>
+					</div>
+					<!-- THIS IS A TAB -->
+					<div id = "Network" class="maintabcontent">
+						<span onclick="this.parentElement.style.display='none'" class="topright">x</span>
+						<h2> Network Visualization </h2>
+						<div id="NMSelector">
+						</div>
+						<button class="NetworkButtons" onclick="saveData(event)" id="save_button_network">Save Data</button>
+						<div id="NetworkInfo">
+						</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	
+	<script>
+		//-----------------------------------
+		// Gets the Network Manager from the Select Tool 
+		//-----------------------------------
+		function getNetworkManagerFromSelector(){
+			//Get the Network Manager Selector
+			var form = document.getElementById("NetworkManagers");
+			var strUser = form.options[form.selectedIndex].value;
+			//Now return the value we grabbed
+			return strUser;
+		}
+		
+		//-----------------------------------
+		//Populates the select element for NM 
+		//-----------------------------------
+		function populateNetworkSelector(list_of_nm){
+			var i;
+			//How are we going to identifiy the network managers? Their ID?
+			//loop through the NM
+			for (i = 0; i < list_of_nm.length; i++){
+				var o = document.createElement("OPTION");
+				o.setAttribute("value", "NM:AC10"); //the value grabbed from the selector
+				var t = document.createTextNode("NM: AC10"); //the name displayed to the user
+				o.appendChild(t);
+				form.appendChild(o);
+			}
+			//Add form to body using pure javascript
+			document.getElementById('NMSelector').appendChild(form);
+		}
+		//-----------------------------------
+		//Button Function to enable/disable data recording to a log file specified by a form
+		//-----------------------------------
+		function RecordData(){
+			//First check if it is already being recorded
+			//if not being recorded; 
+				//grab save file from form
+				//write a message to the server to start recording 
+				//Set the mode state to saving
+				//change the button to say "stop recording"
+			//else
+				//write a message to teh server to stop recording
+				//change the button to say "start recording"
+						//Get the text from the button
+						
+			/*Previous example */
+			if(document.getElementById('save_button').innerHTML == "Save Data"){
+				//Start Saving
+				ws.send("StartSaving");
+				//Change the button
+				document.getElementById('save_button').innerHTML = "Stop Saving";
+				document.getElementById('save_button_network').innerHTML = "Stop Saving";
+			}
+			else{
+				ws.send("StopSaving");
+				document.getElementById('save_button').innerHTML = "Save Data";
+				document.getElementById('save_button_network').innerHTML = "Save Data";
+			}
+		}
+		
+		//-----------------------------------
+		//Creates the Main Tab contents and hides the rest
+		//-----------------------------------
+		function openMainTab(evt, tabName){
+			//declare all variables
+			var i, tabcontent, tablinks;
+			
+			//get all elements with class="tabcontent" and hide them
+			tabcontent = document.getElementsByClassName("maintabcontent");
+			for (i =0; i < tabcontent.length; i++){
+				tabcontent[i].style.display = "none";
+			}
+			
+			//get all elements with class tablinks" and remove the class "active"
+			tablinks = document.getElementsByClassName("tablinks");
+			for (i=0; i < tablinks.length; i++){
+				tablinks[i].className = tablinks[i].className.replace(" active", "");
+			}
+			
+			//show current tab and add an active class to the button that opened the tab
+			document.getElementById(tabName).style.display = "block";
+			evt.currentTarget.className += " active";
+		}
+		//Set the default window
+		document.getElementById("defaultOpen").click();
+		//-----------------------------------
+		//Creates the Accordian Panels for each Balloon/Aircraft
+		//-----------------------------------
+		var acc = document.getElementsByClassName("accordion");
+		var i;
+		//THIS IS FOR THE ACCORDION AIRCRAFT TABS
+		for (i = 0; i < acc.length; i++) {
+			acc[i].addEventListener("click", function() {
+				this.classList.toggle("active");
+				var panel = this.nextElementSibling;
+				if (panel.style.display === "block") {
+					panel.style.display = "none";
+				} else {
+					panel.style.display = "block";
+				}
+			});
+		}
+		
+		//-----------------------------------
+		var host = window.location.host;
+		var Mode = 0;
+		var ws;
+		var $message = $('#ServerStatus');
+		//-----------------------------------
+		// Function for managing webserver connections
+		//-----------------------------------
+		function manageServer(){
+			//Starts the websocket part of the server
+			if (document.getElementById('server_button').innerHTML == "Start"){
+				ws = new WebSocket('ws://'+host+'/ws');
+				document.getElementById('server_button').innerHTML="Stop";
+				Mode = 1; //web server is on
+				
+				ws.onopen = function(){
+					$message.attr("class",'label label-success');
+					$message.text('open');
+					ws.send("Start_Stream");
+				};
+				ws.onmessage = function(ev){
+					var json = JSON.parse(ev.data);
+					console.log("We have recieved a Json String");
+					parseNormalMsg(json);
+				};
+				ws.onclose = function(ev){
+					$message.attr("class", 'label label-important');
+					$message.text('closed');
+				};
+				ws.onerror = function(ev){
+					$message.attr("class", 'label label-warning');
+					$message.text('error occurred');
+					Mode = 0; //web server is off
+				};
+			}
+			else{
+				ws.close();
+				document.getElementById('server_button').innerHTML="Start";
+				Mode = 0; //Web server is off
+			}
+		}
+		//-----------------------------------
+		//  Message Parsing Functions
+		//-----------------------------------
+		BL_IDs = [];
+		firstTime = true
+		function parseNormalMsg(jdata){
+			//Determine if we have a Balloon Sensor set json message
+			if(jdata.hasOwnProperty("Balloon_Sensor_Set_Msg")){
+			
+				tempdata = jdata.Balloon_Sensor_Set_Msg;
+				console.log("We are processing Balloon Sensor Set");
+				//Always update all balloons if possible just dont' display if not desired
+				var BL_List = document.getElementsByClassName("accordion"); //Get the list of balloons
+				//Check how many balloons we have being read
+				
+				//Loop through the parse message for each balloon 
+				for (var blid = 0; blid < tempdata.NumberOfBalloons; blid ++){
+					//parse the balloon 
+					//Figure out the keys for which ID goes with which on the webpage incase of mixup
+					if (firstTime){
+						BL_ID[blid] = tempdata.balloon[blid].ID;
+					}
+					//Figure out the BL_List
+					myid = tempdata.balloon[blid].ID
+					//something here to figure out how to check which one it is
+					trueIndex = 1; //set the true index based on which Balloon display part
+					suffix = trueIndex + 1
+					//Update the plots for the corresponding element
+					updateBalloonPlots(tempdata.balloon[blid],suffix)
+					//get the html string that displays the relevant data we want
+					jstr = jDataToHTML_BL(tempdata.balloon[blid])
+					//hand the html string to the inner block for the element that corresponds
+					document.getElementById(("bldata_" + suffix)).innerHTML = jstr;
+				}
+			}
+			
+			//if Network Manager Msg exists
+			if (jdata.hasOwnProperty("NMStatus")){
+				console.log("We are processing the NMStatus")
+				//update the NMStatus
+				document.getElementById("NetworkInfo").innerHTML = jDataToHTML_NW(jdata.NMStatus);
+			}
+			
+			//In case we want to plot the Aircraft too
+			if (jdata.hasOwnProperty("PixhawkAircraftState")){
+				console.log("TODO: Plot information relative to carrier aircraft");
+			}
+			
+			//Lastly Update Visual Markers
+			updateMarkers(jdata);
+		}
+		
+		function updateMarkers(jdata){
+			markers.clearLayers(); //clear all markers
+			//Update balloons
+			updateBalloonMarkers(jdata);
+			//update gcs
+			updateGCSMarker(jdata);
+			//update aircraft marker
+			updateACMarker(jdata);
+			//Update storm marker
+			updateStormMarker(jdata);
+		}
+		
+		function updateBalloonMarkers(jdata){
+			//Add Balloon Markers
+			if (jdata.hasOwnProperty("Balloon_Sensor_Set_Msg")){
+				tempdata = jdata.Balloon_Sensor_Set_Msg;
+				console.log("Updating Balloon Markers");
+				for (var i = 0; i < tempdata.NumberOfBalloons; i++){
+					//figure out the true index for the balloon
+					blMarker[trueIndex] = L.marker([tempdata.balloon[i].LLAPos.x,tempdata.balloon[i].LLAPos.y],{icon:balloonIcon, rotationAngle: 0}).addTo(markers).bindTooltip(("Balloon_" + tempdata.balloon[i].ID),{permanent: false, direction:'top',opacity: .7});
+					blTrail[trueIndex] = updateTrail(blTrail[trueIndex],[tempdata.balloon[i].LLAPos.x,tempdata.balloon[i].LLAPos.y]);
+					blPoly[trueIndex] = L.polyline(blTrail[trueindex],{color:'blue'}).addTo(markers);
+				}
+			}
+		}
+		
+		function updateGCSMarker(jdata){
+			console.log("Updating GCS Markers");
+			if(jdata.hasOwnProperty("Balloon_Sensor_Set_Msg")){
+				tempdata = jdata.Balloon_Sensor_Set_Msg;
+				//Grab it from the jdata
+				gcsMarker = L.marker([tempdata.receiverLLAPos.x,tempdata.receiverLLAPos.y],{icon: gcsIcon, rotatedAngle: 0}).addTo(markers);
+			}
+			else{
+				//Check if we can use the stationary input 
+				//if the form has been filled out
+				//var str = $('form').serialize() //this produces "bar=xxx&"
+				var formElements = documents.getElementById("locationForm").elements;
+				//use the position to update the location
+				var substr = formElements[0].value;
+				//Split string
+				var splitstr = substr.split(",");
+				//Parse into floats
+				if (splitstr[0] != "lat"){
+					//assume if the user has changed it; it is a valid float to be parsed
+					var lat = parseFloat(splitstr[0]);
+					var lon = parseFloat(splitstr[1]);
+					gcsMarker = L.marker([lat,lon],{icon: gcsIcon, rotatedAngle: 0}).addTo(markers);
+				}
+			}
+		}
+		
+		function updateACMarker(jdata){
+			console.log("Updating AC Markers");
+			if(jdata.hasOwnProperty("PixhawkAircraftState")){
+				acMarker = L.marker([jdata.PixhawkAircraftState.LLAPos.x,jdata.PixhawkAircraftState.LLAPos.y],{icon: planeIcon, rotatedAngle: (180/3.1415 * jdata.PixhawkAircraftState.attitude.z)}).addTo(markers);
+			}
+		}
+		
+		function updateTrail(inTrail, latlng){
+			if(inTrail.length >= 50){
+				inTrail.pop();
+			}
+			inTrail.unshift(latlng);
+			return inTrail;
+		}
+		
+		function updateBalloonPlots(balloon_data, suffix){
+			//Altitude
+			plotName = ("blaltitudeplot_" + suffix);
+			bl_altitude[suffix-1][0].y.push(balloon_data.LLAPos.z);
+			bl_altitude[suffix-1][0].y.shift();
+			Plotly.redraw(plotName,bl_altitude[suffix-1]);
+			//Pressure
+			plotName = ("blpressureplot_" + suffix);
+			bl_pressure[suffix-1][0].y.push(balloon_data.pthsensor.pressure);
+			bl_pressure[suffix-1][0].y.shift();
+			Plotly.redraw(plotName,bl_pressure[suffix-1]);
+			//Temperature
+			plotName = ("bltemperatureplot_" + suffix);
+			bl_temperature[suffix-1][0].y.push(balloon_data.pthsensor.temperature);
+			bl_temperature[suffix-1][0].y.shift();
+			Plotly.redraw(plotName,bl_temperature[suffix-1]);
+			//Humidity
+			plotName = ("blhumidityplot_" + suffix);
+			bl_humidity[suffix-1][0].y.push(balloon_data.pthsensor.humidity);
+			bl_humidity[suffix-1][0].y.shift();
+			Plotly.redraw(plotName,bl_humidity[suffix-1]);
+			//RSSI
+			plotName = ("blrssiplot_" + suffix);
+			bl_rssi[suffix-1][0].y.push(balloon_data.rssi);
+			bl_rssi[suffix-1][0].y.shift();
+			Plotly.redraw(plotName,bl_rssi[suffix-1]);
+		}	
+		
+		//-----------------------------------
+		// The Map Overlay
+		//-----------------------------------
+		var map = L.map('mapid').setView([40.145289, -105.247178], 10);
+		//TODO: Update this part for background of map button
+		if((window.location.search.substring(0)).search('avChart') > 0) {
+			L.tileLayer('http://wms.chartbundle.com/tms/1.0.0/sec/{z}/{x}/{y}.png?type=google').addTo(map);
+		} else {
+			L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic2JvcmVuc3RlaW4iLCJhIjoiY2oydG1rcmx3MDBibzJxczNhcXMwdTQ0NCJ9.yNu8frc3Y9KukxQcnTa6oA').addTo(map);
+		} 
+		
+		markers = new L.LayerGroup().addTo(map);
+		
+		//Markers
+		var blMarker = [];
+		var acMarker = [];
+		var gcsMarker = [];
+		var acPoly = [];
+		var acTrail = [];
+		var blPoly = [];
+		var blTrail = [[]];
+		
+		//-----------------------------------
+		// Icons for the Map
+		//-----------------------------------
+		var planeIcon = L.icon({
+			iconUrl: 'images/plane.png',
+			iconSize: [40,40],
+			iconAnchor: [20,20],
+			popupAnchor: [0,-40]
+		});
+		var gcsIcon = L.icon({
+			iconUrl: 'images/ground_station.png',
+			iconSize: [40,40],
+			iconAnchor: [20,20]
+		});
+		var transmitterIcon = L.icon({
+			iconUrl: 'images/beacon_icon.png',
+			iconSize: [40,40],
+			iconAnchor: [20,20]
+		});
+		var waypointIcon = L.icon({
+			iconUrl: 'images/icon_waypoint.png',
+			iconSize: [40,40],
+			iconAnchor: [20,20]
+		});
+		
+		//Add balloon icon
+		
+		//-----------------------------------
+		// JSON to HTML Formatting
+		//-----------------------------------
+		function getFixed(data, digits) {
+			if ((typeof data !== 'undefined') && data != null) {
+				return data.toFixed(digits);
+			} else {
+				return -1;
+			}
+		}
+		
+		function jDataToHTML_BL(balloon_data){
+			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Aircraft:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + balloon_data.ID + "</TD>"; //Balloon ID
+			oStr += "<TH style=\"width:150px;\" nowrap>Aircraft:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + balloon_data.packetNum + "</TD>"; //Balloon Packet Number
+			oStr += "<TH style=\"width:150px;\" nowrap>Battery Voltage:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.batteryStatus.voltage,2) + "</TD>"; //Battery Voltage
+			oStr += "<TH style=\"width:150px;\" nowrap>Battery Voltage:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.rssi,2) + "</TD>"; //RF Comm RSSI
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Lat:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.LLAPos.x,4) + "</TD>"; // Latitude
+			oStr += "<TH style=\"width:150px;\" nowrap>Lon:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(ballooon_data.LLAPos.y,4) + "</TD>"; // Longitude
+			oStr += "<TH style=\"width:150px;\" nowrap>Altitude:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.LLAPos.z,2) + "</TD>"; //Altitude (ASL or AGL?)
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Vel X:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.x,4) + "</TD>"; // Latitude
+			oStr += "<TH style=\"width:150px;\" nowrap>Vel Y:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(ballooon_data.Vel.y,4) + "</TD>"; // Longitude
+			oStr += "<TH style=\"width:150px;\" nowrap>Vel Z:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.z,2) + "</TD>"; //Altitude (ASL or AGL?)
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>Pressure:</TH><TD class=\" zelle\" style=\"width:100px;\" nowrap>" + getFixed(balloon_data.presure,2) + "</TD>"; //pressure
+			oStr += "<TH style=\" width:150px;\" nowrap>Temperature:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.temperature, 2) + "</TD>"; //temperature
+			oStr += "<TH style=\" width:150px;\" nowrap>Humidity:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.humidity, 2) + "</TD>"; //humidity
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "</TR></TABLE>"; 
+			
+			return oStr;
+		}
+		
+		function jDataToHTML_BL_TEST(){
+			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			oStr += "<TH style=\"width:100px;\" nowrap>Balloon:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "MyID" + "</TD>"; //Balloon ID
+			oStr += "<TH style=\"width:100px;\" nowrap>Packet Number:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + 100 + "</TD>"; //Balloon Packet Number
+			oStr += "<TH style=\"width:100px;\" nowrap>Battery Voltage:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(11.89,2) + "</TD>"; //Battery Voltage
+			oStr += "<TH style=\"width:100px;\" nowrap>RSSI:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(-89.34,2) + "</TD>"; //RF Comm RSSI
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:100px;\" nowrap>Lat:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(40.38294,4) + "</TD>"; // Latitude
+			oStr += "<TH style=\"width:100px;\" nowrap>Lon:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(-105.4920,4) + "</TD>"; // Longitude
+			oStr += "<TH style=\"width:100px;\" nowrap>Altitude:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(1783,2) + "</TD>"; //Altitude (ASL or AGL?)
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:100px;\" nowrap>Vel X:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(9.3,2) + "</TD>"; // Latitude
+			oStr += "<TH style=\"width:100px;\" nowrap>Vel Y:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(3.2,2) + "</TD>"; // Longitude
+			oStr += "<TH style=\"width:100px;\" nowrap>Vel Z:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(5.7,2) + "</TD>"; //Altitude (ASL or AGL?)
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "</TR><TR>";
+			oStr += "<TH style=\"width:100px;\" nowrap>Pressure:</TH><TD class=\" zelle\" style=\"width:100px;\" nowrap>" + getFixed(30.2,2) + "</TD>"; //pressure
+			oStr += "<TH style=\" width:100px;\" nowrap>Temperature:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(039, 2) + "</TD>"; //temperature
+			oStr += "<TH style=\" width:100px;\" nowrap>Humidity:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(100, 2) + "</TD>"; //humidity
+			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "</TR></TABLE>"; 
+			
+			return oStr;
+		}
+		
+		function jDataToHTML_NW(jData){
+			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap> NWManager ID: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.ID + "</TD>"; //Network Manager Platform / ID
+			oStr += "<TH style=\"width:150px;\" nowrap> Msgs in Que: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.messagesInQue + "</TD>"; //Que Size
+			oStr += "<TH style=\"width:150px;\" nowrap> Avg Time Delay: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.avgTimeDelay*1000,2) + "</TD>"; //Avg Msg Delay
+			oStr += "<TH style=\"width:150px;\" nowrap> # Local Subscribers: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.numberOfLocalSubscribers + "</TD>"; //Number of Local Subscribers
+			oStr += "<TH style=\"width:150px;\" nowrap> # Global Subscribers: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + jData.numberOfGlobalSubscribers + "</TD>"; //Number of All Subscribers
+			oStr += "</TR></TABLE>";
+			oStr += "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			//Now loop through subscribers
+			for(var i =0; i < jData.numberOfLocalSubscribers; i++){
+				data = jData.subs[i];
+				//For each subscriber
+				oStr += "<TH style=\"width:100px;\" nowrap>Subscriber #: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + i + "</TD>"; //Subscriber ID
+				oStr += "<TH style=\"width:100px;\" nowrap>ID: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + data.id + "</TD>"; //Subscriber ID
+				oStr += "<TH style=\"width:100px;\" nowrap>Data Type: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + data.datatype + "</TD>"; //Subscriber Data Type
+				oStr += "<TH style=\"width:100px;\" nowrap>Msg Rate: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + data.msgfreq + "</TD>"; //Subscriber Data Rate
+				oStr += "<TH style=\"width:100px;\" nowrap>IP: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + data.address + "</TD>"; //Subscriber IP
+				oStr += "<TH style=\"width:100px;\" nowrap>Port:  </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + data.port + "</TD>"; //Subscriber Port
+				oStr += "</TR><TR>"
+			}
+			//End of loop
+			oStr += "</TR></TABLE>";
+			return oStr;
+		}
+		
+		function jDataToHTML_NW_TEST(){
+			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			oStr += "<TH style=\"width:150px;\" nowrap>NWManager ID: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "CC01" + "</TD>"; //Network Manager Platform / ID
+			oStr += "<TH style=\"width:150px;\" nowrap>Msgs in Que: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "2" + "</TD>"; //Que Size
+			oStr += "<TH style=\"width:150px;\" nowrap>Avg Time Delay: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "2.91 ms" + "</TD>"; //Avg Msg Delay
+			oStr += "<TH style=\"width:150px;\" nowrap># Local Subscribers: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "3" + "</TD>"; //Number of Local Subscribers
+			oStr += "<TH style=\"width:150px;\" nowrap># Global Subscribers: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "5" + "</TD>"; //Number of All Subscribers
+			oStr += "</TR></TABLE>";
+			oStr += "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
+			//Now loop through subscribers
+			for(var i =0; i < 3; i++){
+				//For each subscriber
+				oStr += "<TH style=\"width:100px;\" nowrap>Subscriber # </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + i + "</TD>"; //Subscriber Num
+				oStr += "<TH style=\"width:100px;\" nowrap>ID: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "AC10" + "</TD>"; //Subscriber ID
+				oStr += "<TH style=\"width:100px;\" nowrap>Data Type: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "State" + "</TD>"; //Subscriber Data Type
+				oStr += "<TH style=\"width:100px;\" nowrap>Msg Rate: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "5Hz" + "</TD>"; //Subscriber Data Rate
+				oStr += "<TH style=\"width:100px;\" nowrap>IP:  </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "192.158.32.42" + "</TD>"; //Subscriber IP
+				oStr += "<TH style=\"width:100px;\" nowrap>Port: </TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + "10000" + "</TD>"; //Subscriber Port
+				oStr += "</TR><TR>"
+			}
+			//End of loop
+			oStr += "</TR></TABLE>";
+			return oStr;
+		}
+		
+		//TEMPORARY AUTO GENERATE THE JDATA TEXT
+		/*
+		document.getElementById("ac_data").innerHTML = jDataToHTML_AC_TEST();
+		document.getElementById("ac_rf_data").innerHTML = jDataToHTML_RF_Data_TEST();
+		document.getElementById("ac_mapping").innerHTML = jDataToHTML_RF_Map_TEST();
+		document.getElementById("NetworkInfo").innerHTML = jDataToHTML_NW_TEST(); */
+		//document.getElementById("bldata_1").innerHTML = jDataToHTML_BL_TEST();
+		
+		
+		//-----------------------------------
+		// Instantiate Plots
+		//-----------------------------------
+		//Set the three colors 
+		var color3 = '#0000cc'; //Blue
+		var color2 = '#cc0000'; //Red
+		var color1 = '#00cc00'; //Green
+		
+		//Layout
+		var layoutAlt = {
+			height: 200,
+			width: 200,
+			title: 'Altitude Graph',
+			yaxis: {
+				tickfont: {
+					family: 'Courier New, monospace',
+					size: 8,
+					color: '#7f7f7f'
+				}
+			},
+			margin: {
+				l: 10,
+				r: 10,
+				b: 20,
+				t: 30,
+				pad: 0
+			}
+		};
+		var layoutPres = {
+			height: 200,
+			width: 200,
+			title: 'Pressure Graph',
+			yaxis: {
+				tickfont: {
+					family: 'Courier New, monospace',
+					size: 8,
+					color: '#7f7f7f'
+				}
+			},
+			margin: {
+				l: 10,
+				r: 10,
+				b: 20,
+				t: 30,
+				pad: 0
+			},
+			hidesources: true
+		};
+		var layoutTemp = {
+			height: 200,
+			width: 200,
+			title: 'Temperature Graph',
+			yaxis: {
+				tickfont: {
+					family: 'Courier New, monospace',
+					size: 8,
+					color: '#7f7f7f'
+				}
+			},
+			margin: {
+				l: 10,
+				r: 10,
+				b: 20,
+				t: 30,
+				pad: 0
+			},
+			hidesources: true
+		};
+		var layoutHum = {
+			height: 200,
+			width: 200,
+			title: 'Humidity Graph',
+			yaxis: {
+				tickfont: {
+					family: 'Courier New, monospace',
+					size: 8,
+					color: '#7f7f7f'
+				}
+			}, 
+			margin: {
+				l: 10,
+				r: 10,
+				b: 20,
+				t: 30,
+				pad: 0
+			},
+			hidesources: true
+		};
+		var layoutRSSI = {
+			height: 200,
+			width: 200,
+			title: 'RSSI Graph',
+			yaxis: {
+				tickfont: {
+					family: 'Courier New, monospace',
+					size: 8,
+					color: '#7f7f7f'
+				}
+			},
+			margin: {
+				l: 10,
+				r: 10,
+				b: 20,
+				t: 30,
+				pad: 0
+			},
+			hidesources: true
+		};
+		
+		//Initialize the array values for the plots
+		var bl_altitude = new Array(4); //For each channel 
+		var bl_pressure = new Array(4); //for each channel
+		var bl_temperature = new Array(4);
+		var bl_humidity = new Array(4);
+		var bl_rssi = new Array(4);
+		for (i=0;i<4;i++){
+			bl_altitude[i] = [{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#00cc00'} 
+			}];
+			bl_pressure[i] = [{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#00cc00'} 
+			}];
+			bl_temperature[i] = [{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#00cc00'} 
+			}];
+			bl_humidity[i] = [{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#00cc00'} 
+			}];
+			bl_rssi[i] = [{
+				x: new Array(120),
+				y: new Array(120),
+				type: 'scatter',
+				line: {color: '#00cc00'} 
+			}];
+			
+			for (j=0; j < 120; j++){
+				//Set the values initially
+				bl_altitude[i][0].x[j] = j + 1;
+				bl_altitude[i][0].y[j] = 0.0;
+				
+				bl_pressure[i][0].x[j] = j + 1;
+				bl_pressure[i][0].y[j] = 0.0;
+				
+				bl_temperature[i][0].x[j] = j + 1;
+				bl_temperature[i][0].y[j] = 0.0;
+				
+				bl_humidity[i][0].x[j] = j + 1;
+				bl_humidity[i][0].y[j] = 0.0;
+				
+				bl_rssi[i][0].x[j] = j + 1;
+				bl_rssi[i][0].y[j] = 0.0;
+			}
+		}
+		
+		//Instantiate the plots
+		Plotly.newPlot('blaltitudeplot_1',bl_altitude[0],layoutAlt,{staticPlot:true});
+		Plotly.newPlot('blaltitudeplot_2',bl_altitude[1],layoutAlt,{staticPlot:true});
+		Plotly.newPlot('blaltitudeplot_3',bl_altitude[2],layoutAlt,{staticPlot:true});
+		Plotly.newPlot('blaltitudeplot_4',bl_altitude[3],layoutAlt,{staticPlot:true});
+		
+		Plotly.newPlot('blpressureplot_1',bl_pressure[0],layoutPres,{staticPlot:true});
+		Plotly.newPlot('blpressureplot_2',bl_pressure[1],layoutPres,{staticPlot:true});
+		Plotly.newPlot('blpressureplot_3',bl_pressure[2],layoutPres,{staticPlot:true});
+		Plotly.newPlot('blpressureplot_4',bl_pressure[3],layoutPres,{staticPlot:true});
+		
+		Plotly.newPlot('bltemperatureplot_1',bl_temperature[0],layoutTemp,{staticPlot:true});
+		Plotly.newPlot('bltemperatureplot_2',bl_temperature[1],layoutTemp,{staticPlot:true});
+		Plotly.newPlot('bltemperatureplot_3',bl_temperature[2],layoutTemp,{staticPlot:true});
+		Plotly.newPlot('bltemperatureplot_4',bl_temperature[3],layoutTemp,{staticPlot:true});
+		
+		Plotly.newPlot('blhumidityplot_1',bl_humidity[0],layoutHum,{staticPlot:true});
+		Plotly.newPlot('blhumidityplot_2',bl_humidity[1],layoutHum,{staticPlot:true});
+		Plotly.newPlot('blhumidityplot_3',bl_humidity[2],layoutHum,{staticPlot:true});
+		Plotly.newPlot('blhumidityplot_4',bl_humidity[3],layoutHum,{staticPlot:true});
+		
+		Plotly.newPlot('blrssiplot_1',bl_rssi[0],layoutRSSI,{staticPlot:true});
+		Plotly.newPlot('blrssiplot_2',bl_rssi[1],layoutRSSI,{staticPlot:true});
+		Plotly.newPlot('blrssiplot_3',bl_rssi[2],layoutRSSI,{staticPlot:true});
+		Plotly.newPlot('blrssiplot_4',bl_rssi[3],layoutRSSI,{staticPlot:true});
+		
+	</script>
+</body>
+</html>

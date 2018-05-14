@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Testing of WebSocket Server</title>
+	<title>Online Observation for Autonomous And Scientific Unmanned Systems</title>
 	<!--<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
 	<link href="css/bootstrap.min.css" rel="stylesheet">
@@ -107,10 +107,7 @@
 	                   
 	                   
 	        }
-	        
-	        
-	        
-	        
+	              
 	        /* Dropdown Button */
 	        .dropbtn {
 	            background-color: #4CAF50;
@@ -197,7 +194,7 @@
 		<table width = "100%" border="0">
 			<tr>
 				<td><img src="images/recuv_logo2.png" width=200></td>
-				<td align=center><font size = "10"> <b> Test Page<!--Online Autonomy & Science Interface System (OASIS)--></b></font></td>
+				<td align=center><font size = "10"> <b> Communication Aware<!--Online Autonomy & Science Interface System (OASIS)--></b></font></td>
 				<td align=right> <button class="button" onClick="manageServer();" id="server_button" value="Start">Start</button>
 				<br> Status: <span id="ServerStatus" type="text" value="off"></span><br/> </td>
 			</tr>
@@ -220,44 +217,50 @@
 					<!-- THIS IS A TAB -->
 					<div id = "Control" class="maintabcontent">
 						<h2> Operations Control </h2>
-						<p> Input Stationary Node Locations </p>
-						<p> Will NEED TO ADD SOMETHING FOR THE VEHICLE'S ADDRESS/ETC for SSH</p>
 						<form>
-							GCS Location:<br>
+							Vehicle IP: 
+							<input type="text" name="ip" value="127.0.0.1"> 
+							<br>
+							Vehicle password: 
+							<input type="text" name="pwd" value="password">
+							<br>
+						</form>
+						<form>
+							GCS Location:
 							<input type="text" name="gcs" value="lat,lon">
 							<br>
-							Transmitter Node Location 1:<br>
+							Transmitter Node Location 1:
 							<input type="text" name="node1" value="lat,lon">
 							<br>
-							Transmitter Node Location 2:<br>
+							Transmitter Node Location 2:
 							<input type="text" name="node2" value="lat,lon">
 							<br>
-							Transmitter Node Location 3:<br>
+							Transmitter Node Location 3:
 							<input type="text" name="node3" value="lat,lon">
 							<br>
 						</form>
-						<p> Mission Type </p>
+						<p> Mission Type
 						<select id="OperationalModes">
 							<option value="LawnMower">LawnMower</option>
 							<option value="Naive">Naive Approach</option>
 							<option value="Simple">Simple Mission</option>
 							<option value="Triangle">Triangle Mission</option>
-						</select>
-						<p> Max Mission Time </p>
+						</select> </p>
+						<p> Max Mission Time
 						<select id="MissionTime">
 							<option value=5>5 Minutess</option>
 							<option value=10>10 Minutes</option>
 							<option value=15>15 Minutes</option>
 							<option value=20>20 Minutes</option>
-						</select> 
-						<p>Logger Mode</p> 
+						</select> </p>
+						<p>Logger Mode:
 						<select id="LoggerMode">
 							<option value="Debug">Debug Mode</option>
 							<option value="Run">Run Mode</option>
-						</select>
+						</select> </p> <br>
 						<!-- NEED LINE BREAKS HERE FOR BUTTONS AND STUFF -->
-						<button class="ControlButtons" onclick="startSystemCheck(event)">System Check</button>
-						<button class="ControlButtons" onclick="controlMission(event)" id="mission_button">Start Mission</button>
+						<button class="ControlButtons" onclick="startSystemCheck(event)">System Check</button> <br>
+						<button class="ControlButtons" onclick="controlMission(event)" id="mission_button">Start Mission</button> <br>
 					</div>
 					<!-- THIS IS A TAB -->
 					<div id = "Visualizing" class="maintabcontent">
@@ -291,13 +294,6 @@
 										</tr>
 									</table>
 								</td>
-								<!--
-								<td id="RF_measured_plot">
-									<!--<span style="display: inline-block;" id="RF_measured_plot"></span> 
-									<!--<span style="display: inline-block;" id="RF_prediction_plot"></span> 
-								</td>
-								<td id="RF_prediction_plot">
-								</td> -->
 							</tr>
 							<tr>
 								<td id ="ac_mapping"></td>
@@ -474,12 +470,6 @@
 						parseNormalMsg(json);
 					}
 					*/
-					//Parse the System_Checkout
-					//if it isn't in checkout mode
-						//assume normal messages
-					//else assume checkout message
-					
-					
 				};
 				ws.onclose = function(ev){
 					$message.attr("class", 'label label-important');
