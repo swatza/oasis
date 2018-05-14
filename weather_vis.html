@@ -651,14 +651,14 @@
 			oStr += "<TH style=\"width:150px;\" nowrap>Altitude:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.LLAPos.z,2) + "</TD>"; //Altitude (ASL or AGL?)
 			oStr += "<TD></TD><TD></TD>"; //Blank Space
 			oStr += "</TR><TR>";
-			oStr += "<TH style=\"width:150px;\" nowrap>Vel X:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.x,4) + "</TD>"; // Latitude
-			oStr += "<TH style=\"width:150px;\" nowrap>Vel Y:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.y,4) + "</TD>"; // Longitude
+			oStr += "<TH style=\"width:150px;\" nowrap>Vel X:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.x,2) + "</TD>"; // Latitude
+			oStr += "<TH style=\"width:150px;\" nowrap>Vel Y:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.y,2) + "</TD>"; // Longitude
 			oStr += "<TH style=\"width:150px;\" nowrap>Vel Z:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.z,2) + "</TD>"; //Altitude (ASL or AGL?)
 			oStr += "<TD></TD><TD></TD>"; //Blank Space
 			oStr += "</TR><TR>";
-			oStr += "<TH style=\"width:150px;\" nowrap>Pressure:</TH><TD class=\" zelle\" style=\"width:100px;\" nowrap>" + getFixed(balloon_data.presure,2) + "</TD>"; //pressure
-			oStr += "<TH style=\" width:150px;\" nowrap>Temperature:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.temperature, 2) + "</TD>"; //temperature
-			oStr += "<TH style=\" width:150px;\" nowrap>Humidity:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.humidity, 2) + "</TD>"; //humidity
+			oStr += "<TH style=\"width:150px;\" nowrap>Pressure:</TH><TD class=\" zelle\" style=\"width:100px;\" nowrap>" + getFixed(balloon_data.pthsensor.pressure,2) + "</TD>"; //pressure
+			oStr += "<TH style=\" width:150px;\" nowrap>Temperature:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.pthsensor.temperature, 2) + "</TD>"; //temperature
+			oStr += "<TH style=\" width:150px;\" nowrap>Humidity:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.pthsensor.humidity, 2) + "</TD>"; //humidity
 			oStr += "<TD></TD><TD></TD>"; //Blank Space
 			oStr += "</TR></TABLE>"; 
 			
