@@ -32,7 +32,6 @@ thefilename = "base.text"
 
 class IndexHandler(web.RequestHandler):
     def get(self):
-        # self.render("test_index.html")
         self.render("weather_vis.html")
 
 class SocketHandler(websocket.WebSocketHandler):
@@ -83,13 +82,12 @@ class ApiHandler(web.RequestHandler):
     def post(self):
         pass
 
-
 class ServerThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         print 'Started Server Thread'
         self.io_loop = ioloop.IOLoop.current()
-
+        
     def run(self):
         self.io_loop.start()
 
@@ -98,7 +96,6 @@ class ServerThread(threading.Thread):
         self.io_loop.stop()
         print 'Closing IO Loop'
         self.io_loop.close()
-
 
 class PublishingThread(threading.Thread):
     def __init__(self, ques):
@@ -241,7 +238,6 @@ def WebServerSide(l, QueList):
             serverTask.stop()
     sys.exit()
 
-
 if __name__ == '__main__':
     lock = Lock()
     # Generate teh Ques
@@ -249,6 +245,7 @@ if __name__ == '__main__':
     for i in range(4):
         newQue = Queue()
         AllQueList.append(newQue)
+
     # Generate A bunch of things for the Reader Side
     pWS = Process(target=WebServerSide, args=(lock, AllQueList))
     pWR = Process(target=WebReaderSide, args=(lock, AllQueList))

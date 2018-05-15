@@ -428,7 +428,7 @@
 		//-----------------------------------
 		//  Message Parsing Functions
 		//-----------------------------------
-		BL_IDs = [];
+		BL_ID = [];
 		firstTime = true
 		function parseNormalMsg(jdata){
 			//Determine if we have a Balloon Sensor set json message
@@ -446,11 +446,12 @@
 					//Figure out the keys for which ID goes with which on the webpage incase of mixup
 					if (firstTime){
 						BL_ID[blid] = tempdata.balloon[blid].ID;
+						firstTime = false;
 					}
 					//Figure out the BL_List
 					myid = tempdata.balloon[blid].ID
 					//something here to figure out how to check which one it is
-					trueIndex = 1; //set the true index based on which Balloon display part
+					trueIndex = 0; //set the true index based on which Balloon display part
 					suffix = trueIndex + 1
 					//Update the plots for the corresponding element
 					updateBalloonPlots(tempdata.balloon[blid],suffix)
@@ -486,7 +487,7 @@
 			//update aircraft marker
 			updateACMarker(jdata);
 			//Update storm marker
-			updateStormMarker(jdata);
+			//updateStormMarker(jdata);
 		}
 		
 		function updateBalloonMarkers(jdata){
@@ -495,10 +496,11 @@
 				tempdata = jdata.Balloon_Sensor_Set_Msg;
 				console.log("Updating Balloon Markers");
 				for (var i = 0; i < tempdata.NumberOfBalloons; i++){
+					trueIndex = i; 
 					//figure out the true index for the balloon
 					blMarker[trueIndex] = L.marker([tempdata.balloon[i].LLAPos.x,tempdata.balloon[i].LLAPos.y],{icon:balloonIcon, rotationAngle: 0}).addTo(markers).bindTooltip(("Balloon_" + tempdata.balloon[i].ID),{permanent: false, direction:'top',opacity: .7});
 					blTrail[trueIndex] = updateTrail(blTrail[trueIndex],[tempdata.balloon[i].LLAPos.x,tempdata.balloon[i].LLAPos.y]);
-					blPoly[trueIndex] = L.polyline(blTrail[trueindex],{color:'blue'}).addTo(markers);
+					blPoly[trueIndex] = L.polyline(blTrail[trueIndex],{color:'blue'}).addTo(markers);
 				}
 			}
 		}
@@ -509,7 +511,7 @@
 				tempdata = jdata.Balloon_Sensor_Set_Msg;
 				//Grab it from the jdata
 				gcsMarker = L.marker([tempdata.receiverLLAPos.x,tempdata.receiverLLAPos.y],{icon: gcsIcon, rotatedAngle: 0}).addTo(markers);
-			}
+			} /*
 			else{
 				//Check if we can use the stationary input 
 				//if the form has been filled out
@@ -526,7 +528,7 @@
 					var lon = parseFloat(splitstr[1]);
 					gcsMarker = L.marker([lat,lon],{icon: gcsIcon, rotatedAngle: 0}).addTo(markers);
 				}
-			}
+			} */
 		}
 		
 		function updateACMarker(jdata){
@@ -619,6 +621,11 @@
 			iconAnchor: [20,20]
 		});
 		
+		var balloonIcon = L.icon({
+			iconUrl: 'images/balloon.png',
+			iconSize: [40,40],
+			iconAnchor: [20,20]
+		});
 		//Add balloon icon
 		
 		//-----------------------------------
@@ -636,22 +643,22 @@
 			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
 			oStr += "<TH style=\"width:150px;\" nowrap>Aircraft:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + balloon_data.ID + "</TD>"; //Balloon ID
 			oStr += "<TH style=\"width:150px;\" nowrap>Aircraft:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + balloon_data.packetNum + "</TD>"; //Balloon Packet Number
-			oStr += "<TH style=\"width:150px;\" nowrap>Battery Voltage:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.batteryStatus.voltage,2) + "</TD>"; //Battery Voltage
+			oStr += "<TH style=\"width:150px;\" nowrap>Battery Voltage:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.battery.voltage,2) + "</TD>"; //Battery Voltage
 			oStr += "<TH style=\"width:150px;\" nowrap>Battery Voltage:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.rssi,2) + "</TD>"; //RF Comm RSSI
 			oStr += "</TR><TR>";
 			oStr += "<TH style=\"width:150px;\" nowrap>Lat:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.LLAPos.x,4) + "</TD>"; // Latitude
-			oStr += "<TH style=\"width:150px;\" nowrap>Lon:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(ballooon_data.LLAPos.y,4) + "</TD>"; // Longitude
-			oStr += "<TH style=\"width:150px;\" nowrap>Altitude:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(jData.LLAPos.z,2) + "</TD>"; //Altitude (ASL or AGL?)
+			oStr += "<TH style=\"width:150px;\" nowrap>Lon:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.LLAPos.y,4) + "</TD>"; // Longitude
+			oStr += "<TH style=\"width:150px;\" nowrap>Altitude:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.LLAPos.z,2) + "</TD>"; //Altitude (ASL or AGL?)
 			oStr += "<TD></TD><TD></TD>"; //Blank Space
 			oStr += "</TR><TR>";
-			oStr += "<TH style=\"width:150px;\" nowrap>Vel X:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.x,4) + "</TD>"; // Latitude
-			oStr += "<TH style=\"width:150px;\" nowrap>Vel Y:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(ballooon_data.Vel.y,4) + "</TD>"; // Longitude
+			oStr += "<TH style=\"width:150px;\" nowrap>Vel X:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.x,2) + "</TD>"; // Latitude
+			oStr += "<TH style=\"width:150px;\" nowrap>Vel Y:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.y,2) + "</TD>"; // Longitude
 			oStr += "<TH style=\"width:150px;\" nowrap>Vel Z:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.z,2) + "</TD>"; //Altitude (ASL or AGL?)
 			oStr += "<TD></TD><TD></TD>"; //Blank Space
 			oStr += "</TR><TR>";
-			oStr += "<TH style=\"width:150px;\" nowrap>Pressure:</TH><TD class=\" zelle\" style=\"width:100px;\" nowrap>" + getFixed(balloon_data.presure,2) + "</TD>"; //pressure
-			oStr += "<TH style=\" width:150px;\" nowrap>Temperature:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.temperature, 2) + "</TD>"; //temperature
-			oStr += "<TH style=\" width:150px;\" nowrap>Humidity:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.humidity, 2) + "</TD>"; //humidity
+			oStr += "<TH style=\"width:150px;\" nowrap>Pressure:</TH><TD class=\" zelle\" style=\"width:100px;\" nowrap>" + getFixed(balloon_data.pthsensor.pressure,2) + "</TD>"; //pressure
+			oStr += "<TH style=\" width:150px;\" nowrap>Temperature:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.pthsensor.temperature, 2) + "</TD>"; //temperature
+			oStr += "<TH style=\" width:150px;\" nowrap>Humidity:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.pthsensor.humidity, 2) + "</TD>"; //humidity
 			oStr += "<TD></TD><TD></TD>"; //Blank Space
 			oStr += "</TR></TABLE>"; 
 			
