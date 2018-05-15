@@ -233,8 +233,8 @@
 						<div class="panel">
 							<span id="bldata_1" style="display: block" valign="top" align=center nowrap></span>
 							<span style="display: inline-block;" id="blaltitudeplot_1"></span>
-							<span style="display: inline-block;" id="blpressureplot_1"></span>
 							<span style="display: inline-block;" id="bltemperatureplot_1"></span>
+							<span style="display: inline-block;" id="blpressureplot_1"></span>
 							<span style="display: inline-block;" id="blhumidityplot_1"></span>
 							<span style="display: inline-block;" id="blrssiplot_1"></span>
 						</div>
@@ -242,8 +242,8 @@
 						<div class="panel">
 							<span id="bldata_2" style="display: block" valign="top" align=center nowrap></span>
 							<span style="display: inline-block;" id="blaltitudeplot_2"></span>
-							<span style="display: inline-block;" id="blpressureplot_2"></span>
 							<span style="display: inline-block;" id="bltemperatureplot_2"></span>
+							<span style="display: inline-block;" id="blpressureplot_2"></span>
 							<span style="display: inline-block;" id="blhumidityplot_2"></span>
 							<span style="display: inline-block;" id="blrssiplot_2"></span>
 						</div>
@@ -251,8 +251,8 @@
 						<div class="panel">
 							<span id="bldata_3" style="display: block" valign="top" align=center nowrap></span>
 							<span style="display: inline-block;" id="blaltitudeplot_3"></span>
-							<span style="display: inline-block;" id="blpressureplot_3"></span>
 							<span style="display: inline-block;" id="bltemperatureplot_3"></span>
+							<span style="display: inline-block;" id="blpressureplot_3"></span>
 							<span style="display: inline-block;" id="blhumidityplot_3"></span>
 							<span style="display: inline-block;" id="blrssiplot_3"></span>
 						</div>
@@ -260,8 +260,8 @@
 						<div class="panel">
 							<span id="bldata_4" style="display: block" valign="top" align=center nowrap></span>
 							<span style="display: inline-block;" id="blaltitudeplot_4"></span>
-							<span style="display: inline-block;" id="blpressureplot_4"></span>
 							<span style="display: inline-block;" id="bltemperatureplot_4"></span>
+							<span style="display: inline-block;" id="blpressureplot_4"></span>
 							<span style="display: inline-block;" id="blhumidityplot_4"></span>
 							<span style="display: inline-block;" id="blrssiplot_4"></span>
 						</div>
@@ -272,7 +272,6 @@
 						<h2> Network Visualization </h2>
 						<div id="NMSelector">
 						</div>
-						<button class="NetworkButtons" onclick="saveData(event)" id="save_button_network">Save Data</button>
 						<div id="NetworkInfo">
 						</div>
 					</div>
@@ -430,6 +429,15 @@
 		//-----------------------------------
 		BL_ID = [];
 		firstTime = true
+		function findTrueID(myID){
+			for (int i = 0; i < BL_ID.length; i++){
+				if (myID == BL_ID[i]){
+				return i
+				}
+			}
+			return -1
+		}
+		
 		function parseNormalMsg(jdata){
 			//Determine if we have a Balloon Sensor set json message
 			if(jdata.hasOwnProperty("Balloon_Sensor_Set_Msg")){
@@ -451,7 +459,10 @@
 					//Figure out the BL_List
 					myid = tempdata.balloon[blid].ID
 					//something here to figure out how to check which one it is
-					trueIndex = 0; //set the true index based on which Balloon display part
+					trueIndex = findTrueID(myid)
+					if (trueIndex == -1){
+						break
+					}
 					suffix = trueIndex + 1
 					//Update the plots for the corresponding element
 					updateBalloonPlots(tempdata.balloon[blid],suffix)
@@ -496,9 +507,12 @@
 				tempdata = jdata.Balloon_Sensor_Set_Msg;
 				console.log("Updating Balloon Markers");
 				for (var i = 0; i < tempdata.NumberOfBalloons; i++){
-					trueIndex = i; 
+					trueIndex = findTrueID(tempdata.balloon[i])
 					//figure out the true index for the balloon
-					blMarker[trueIndex] = L.marker([tempdata.balloon[i].LLAPos.x,tempdata.balloon[i].LLAPos.y],{icon:balloonIcon, rotationAngle: 0}).addTo(markers).bindTooltip(("Balloon_" + tempdata.balloon[i].ID),{permanent: false, direction:'top',opacity: .7});
+					if (trueIndex == -1){
+						break;
+					}
+					blMarker[trueIndex] = L.marker([tempdata.balloon[i].LLAPos.x,tempdata.balloon[i].LLAPos.y],{icon:balloonIcon, rotationAngle: 0}).addTo(markers).bindTooltip(("Balloon_" + tempdata.balloon[i].ID),{permanent: true, direction:'top',opacity: .7});
 					blTrail[trueIndex] = updateTrail(blTrail[trueIndex],[tempdata.balloon[i].LLAPos.x,tempdata.balloon[i].LLAPos.y]);
 					blPoly[trueIndex] = L.polyline(blTrail[trueIndex],{color:'blue'}).addTo(markers);
 				}
@@ -859,6 +873,7 @@
 			},
 			hidesources: true
 		};
+		plotColor = '#00cc00';
 		
 		//Initialize the array values for the plots
 		var bl_altitude = new Array(4); //For each channel 
@@ -871,31 +886,31 @@
 				x: new Array(120),
 				y: new Array(120),
 				type: 'scatter',
-				line: {color: '#00cc00'} 
+				line: {color: plotColor} 
 			}];
 			bl_pressure[i] = [{
 				x: new Array(120),
 				y: new Array(120),
 				type: 'scatter',
-				line: {color: '#00cc00'} 
+				line: {color: plotColor} 
 			}];
 			bl_temperature[i] = [{
 				x: new Array(120),
 				y: new Array(120),
 				type: 'scatter',
-				line: {color: '#00cc00'} 
+				line: {color: plotColor} 
 			}];
 			bl_humidity[i] = [{
 				x: new Array(120),
 				y: new Array(120),
 				type: 'scatter',
-				line: {color: '#00cc00'} 
+				line: {color: plotColor} 
 			}];
 			bl_rssi[i] = [{
 				x: new Array(120),
 				y: new Array(120),
 				type: 'scatter',
-				line: {color: '#00cc00'} 
+				line: {color: plotColor} 
 			}];
 			
 			for (j=0; j < 120; j++){
