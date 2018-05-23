@@ -461,7 +461,9 @@
 					//something here to figure out how to check which one it is
 					trueIndex = findTrueID(myid)
 					if (trueIndex == -1){
-						break
+						//add any new ones to the list later
+						BL_ID[blid] = tempdata.balloon[blid].ID
+						trueIndex = blid;
 					}
 					suffix = trueIndex + 1
 					//Update the plots for the corresponding element
