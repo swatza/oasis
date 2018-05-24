@@ -467,19 +467,14 @@
 					trueIndex = findTrueID(myid)
 					if (trueIndex == -1){
 						//add any new ones to the list later
-<<<<<<< HEAD
-						BL_ID[blid] = tempdata.balloon[blid].ID
-						trueIndex = blid;
-=======
 						BL_ID[blid]=tempdata.balloon[blid].ID
 						trueIndex = blid
->>>>>>> debugging changes made to .html
 					}
 					suffix = trueIndex+1
 					//Update the plots for the corresponding element
 					updateBalloonPlots(tempdata.balloon[blid],suffix)
 					//get the html string that displays the relevant data we want
-					jstr = jDataToHTML_BL(tempdata.balloon[blid])
+					jstr = jDataToHTML_BL(tempdata,tempdata.balloon[blid])
 					//hand the html string to the inner block for the element that corresponds
 					document.getElementById(("bldata_" + suffix)).innerHTML = jstr;
 				}
@@ -667,7 +662,7 @@
 			}
 		}
 		
-		function jDataToHTML_BL(balloon_data){
+		function jDataToHTML_BL(tempdata,balloon_data){
 			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
 			oStr += "<TH style=\"width:150px;\" nowrap>Drifter ID:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + balloon_data.ID + "</TD>"; //Balloon ID
 			oStr += "<TH style=\"width:150px;\" nowrap>Sequence #:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + balloon_data.packetNum + "</TD>"; //Balloon Packet Number
@@ -677,17 +672,17 @@
 			oStr += "<TH style=\"width:150px;\" nowrap>Lat:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.LLAPos.x,4) + "</TD>"; // Latitude
 			oStr += "<TH style=\"width:150px;\" nowrap>Lon:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.LLAPos.y,4) + "</TD>"; // Longitude
 			oStr += "<TH style=\"width:150px;\" nowrap>Altitude:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.LLAPos.z,2) + "</TD>"; //Altitude (ASL or AGL?)
-			oStr += "<TH style=\"width:150px;\" nowrap>Receiver Lat"
+			oStr += "<TH style=\"width:150px;\" nowrap>Receiver Lat:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(tempdata.receiverLLAPos.x,4) + "</TD>"; //Receiver Lat
 			oStr += "</TR><TR>";
 			oStr += "<TH style=\"width:150px;\" nowrap>Vel X:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.x,2) + "</TD>"; // Latitude
 			oStr += "<TH style=\"width:150px;\" nowrap>Vel Y:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.y,2) + "</TD>"; // Longitude
 			oStr += "<TH style=\"width:150px;\" nowrap>Vel Z:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.z,2) + "</TD>"; //Altitude (ASL or AGL?)
-			oStr += "<TH style=\"width:150px;\" nowrap>Receiver Lon"
+			oStr += "<TH style=\"width:150px;\" nowrap>Receiver Lon:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(tempdata.receiverLLAPos.y,4) + "</TD>"; //Receiver Lon
 			oStr += "</TR><TR>";
 			oStr += "<TH style=\"width:150px;\" nowrap>Pressure:</TH><TD class=\" zelle\" style=\"width:100px;\" nowrap>" + getFixed(balloon_data.pthsensor.pressure,2) + "</TD>"; //pressure
 			oStr += "<TH style=\" width:150px;\" nowrap>Temperature:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.pthsensor.temperature, 2) + "</TD>"; //temperature
 			oStr += "<TH style=\" width:150px;\" nowrap>Humidity:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.pthsensor.humidity, 2) + "</TD>"; //humidity
-			oStr += "<TH style=\"width:150px;\" nowrap>Receiver Alt"
+			oStr += "<TH style=\"width:150px;\" nowrap>Receiver Lat:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(tempdata.receiverLLAPos.z,4) + "</TD>"; //Receiver Alt
 			oStr += "</TR></TABLE>"; 
 			
 			return oStr;
