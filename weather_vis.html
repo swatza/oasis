@@ -134,7 +134,7 @@
 	           background: -o-linear-gradient(top, #3e779d, #65a9d7);
 	           padding: 5px 5px;
 	           -webkit-border-radius: 7px;
-	           -moz-border-radius: 7px;
+	           -moz-border-radius: 70px;
 	           border-radius: 7px;
 	           -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
 	           -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
@@ -223,7 +223,7 @@
 							<input type="text" name="savefilename" value="myexamplesavefile"> 
 							<br>
 						</form>
-						<button class="ControlButtons" onclick="RecordData">Start Recording</button> </br>
+						<button id="save_button" class="ControlButtons" onclick="RecordData()">Start Recording</button> </br>
 					</div>
 					<!-- THIS IS A TAB -->
 					<div id = "Visualizing" class="maintabcontent">
@@ -313,7 +313,7 @@
 		//-----------------------------------
 		//Button Function to enable/disable data recording to a log file specified by a form
 		//-----------------------------------
-		function RecordData(){
+		function RecordData() {
 			//First check if it is already being recorded
 			//if not being recorded; 
 				//grab save file from form
@@ -326,18 +326,23 @@
 						//Get the text from the button
 						
 			/*Previous example */
-			if(document.getElementById('save_button').innerHTML == "Save Data"){
+			//document.getElementById("save_button").innerHTML = "I made it";
+			
+			if(document.getElementById('save_button').innerHTML == "Start Recording"){
 				//Start Saving
+				console.log(ws)
 				ws.send("StartSaving");
 				//Change the button
-				document.getElementById('save_button').innerHTML = "Stop Saving";
-				document.getElementById('save_button_network').innerHTML = "Stop Saving";
+				console.log("Recording")
+				document.getElementById('save_button').innerHTML = "Stop Recording";
+				//document.getElementById('save_button_network').innerHTML = "Stop Saving";
 			}
 			else{
 				ws.send("StopSaving");
-				document.getElementById('save_button').innerHTML = "Save Data";
-				document.getElementById('save_button_network').innerHTML = "Save Data";
+				document.getElementById('save_button').innerHTML = "Start Recording";
+				//document.getElementById('save_button_network').innerHTML = "Save Data";
 			}
+			
 		}
 		
 		//-----------------------------------
@@ -430,12 +435,12 @@
 		BL_ID = [];
 		firstTime = true
 		function findTrueID(myID){
-			for (int i = 0; i < BL_ID.length; i++){
+			for (var i = 0; i < BL_ID.length; i++){
 				if (myID == BL_ID[i]){
-				return i
+				return i;
 				}
 			}
-			return -1
+			return -1;
 		}
 		
 		function parseNormalMsg(jdata){
@@ -457,15 +462,20 @@
 						firstTime = false;
 					}
 					//Figure out the BL_List
-					myid = tempdata.balloon[blid].ID
+					var myid = tempdata.balloon[blid].ID
 					//something here to figure out how to check which one it is
 					trueIndex = findTrueID(myid)
 					if (trueIndex == -1){
 						//add any new ones to the list later
+<<<<<<< HEAD
 						BL_ID[blid] = tempdata.balloon[blid].ID
 						trueIndex = blid;
+=======
+						BL_ID[blid]=tempdata.balloon[blid].ID
+						trueIndex = blid
+>>>>>>> debugging changes made to .html
 					}
-					suffix = trueIndex + 1
+					suffix = trueIndex+1
 					//Update the plots for the corresponding element
 					updateBalloonPlots(tempdata.balloon[blid],suffix)
 					//get the html string that displays the relevant data we want
@@ -492,24 +502,26 @@
 		}
 		
 		function updateMarkers(jdata){
-			markers.clearLayers(); //clear all markers
-			//Update balloons
-			updateBalloonMarkers(jdata);
-			//update gcs
-			updateGCSMarker(jdata);
-			//update aircraft marker
-			updateACMarker(jdata);
-			//Update storm marker
-			//updateStormMarker(jdata);
+			if (jdata.hasOwnProperty("Balloon_Sensor_Set_Msg")){
+				markers.clearLayers(); //clear all markers
+				//Update balloons
+				updateBalloonMarkers(jdata);
+				//update gcs
+				updateGCSMarker(jdata);
+				//update aircraft marker
+				updateACMarker(jdata);
+				//Update storm marker
+				//updateStormMarker(jdata);
+			}
 		}
-		
+
 		function updateBalloonMarkers(jdata){
 			//Add Balloon Markers
 			if (jdata.hasOwnProperty("Balloon_Sensor_Set_Msg")){
 				tempdata = jdata.Balloon_Sensor_Set_Msg;
 				console.log("Updating Balloon Markers");
 				for (var i = 0; i < tempdata.NumberOfBalloons; i++){
-					trueIndex = findTrueID(tempdata.balloon[i])
+					trueIndex = findTrueID(tempdata.balloon[i].ID)
 					//figure out the true index for the balloon
 					if (trueIndex == -1){
 						break;
@@ -657,25 +669,25 @@
 		
 		function jDataToHTML_BL(balloon_data){
 			oStr = "<TABLE class =\"tabelle separate\" style=\"width:600px; table-layout: fixed;\"align=center><TR>";
-			oStr += "<TH style=\"width:150px;\" nowrap>Aircraft:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + balloon_data.ID + "</TD>"; //Balloon ID
-			oStr += "<TH style=\"width:150px;\" nowrap>Aircraft:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + balloon_data.packetNum + "</TD>"; //Balloon Packet Number
+			oStr += "<TH style=\"width:150px;\" nowrap>Drifter ID:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + balloon_data.ID + "</TD>"; //Balloon ID
+			oStr += "<TH style=\"width:150px;\" nowrap>Sequence #:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + balloon_data.packetNum + "</TD>"; //Balloon Packet Number
 			oStr += "<TH style=\"width:150px;\" nowrap>Battery Voltage:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.battery.voltage,2) + "</TD>"; //Battery Voltage
-			oStr += "<TH style=\"width:150px;\" nowrap>Battery Voltage:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.rssi,2) + "</TD>"; //RF Comm RSSI
+			oStr += "<TH style=\"width:150px;\" nowrap>RSSI:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.rssi,2) + "</TD>"; //RF Comm RSSI
 			oStr += "</TR><TR>";
 			oStr += "<TH style=\"width:150px;\" nowrap>Lat:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.LLAPos.x,4) + "</TD>"; // Latitude
 			oStr += "<TH style=\"width:150px;\" nowrap>Lon:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.LLAPos.y,4) + "</TD>"; // Longitude
 			oStr += "<TH style=\"width:150px;\" nowrap>Altitude:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.LLAPos.z,2) + "</TD>"; //Altitude (ASL or AGL?)
-			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "<TH style=\"width:150px;\" nowrap>Receiver Lat"
 			oStr += "</TR><TR>";
 			oStr += "<TH style=\"width:150px;\" nowrap>Vel X:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.x,2) + "</TD>"; // Latitude
 			oStr += "<TH style=\"width:150px;\" nowrap>Vel Y:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.y,2) + "</TD>"; // Longitude
 			oStr += "<TH style=\"width:150px;\" nowrap>Vel Z:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.z,2) + "</TD>"; //Altitude (ASL or AGL?)
-			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "<TH style=\"width:150px;\" nowrap>Receiver Lon"
 			oStr += "</TR><TR>";
 			oStr += "<TH style=\"width:150px;\" nowrap>Pressure:</TH><TD class=\" zelle\" style=\"width:100px;\" nowrap>" + getFixed(balloon_data.pthsensor.pressure,2) + "</TD>"; //pressure
 			oStr += "<TH style=\" width:150px;\" nowrap>Temperature:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.pthsensor.temperature, 2) + "</TD>"; //temperature
 			oStr += "<TH style=\" width:150px;\" nowrap>Humidity:</TH><TD class=\" zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.pthsensor.humidity, 2) + "</TD>"; //humidity
-			oStr += "<TD></TD><TD></TD>"; //Blank Space
+			oStr += "<TH style=\"width:150px;\" nowrap>Receiver Alt"
 			oStr += "</TR></TABLE>"; 
 			
 			return oStr;

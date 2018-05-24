@@ -51,7 +51,6 @@ class SocketHandler(websocket.WebSocketHandler):
 
     def on_message(self, message):
         command = message.split(",")[0]
-        argument = message.split(",")[1]
         if command == "Start_Stream":
             # add this client to receive data updates
             msg_cl.append(self)
@@ -62,8 +61,10 @@ class SocketHandler(websocket.WebSocketHandler):
             print 'Removed client from streaming list'
         elif command == "StartSaving":
             # Start saving data to a log file
+            print ("Started Recording Data")
             recording = True
-            thefilename = argument
+            #argument = message.split(",")[1]
+            thefilename = "myfile.txt"
         elif command == "StopSaving":
             # Stop saving data to a log file
             recording = False
@@ -130,8 +131,9 @@ class PublishingThread(threading.Thread):
                     if msg_cl:
                         for c in msg_cl:
                             c.write_message(json_data)
+                            print 'json_data'
                             if recording:
-                                myrecordlog.write(json_data + '\n')
+                                self.myrecordlog.write(json_data + '\n')
                                 #write the json stuff to a file
                             print 'sent message'
                 # Now update the last time this frequency set was handled

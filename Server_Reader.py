@@ -127,7 +127,7 @@ class StreamReaderThread(threading.Thread):
                         pktData = newPkt.getData()
                         # convert to protobuf type
                         datastr = str(pktData)
-                        msg, thisType = PyPacket.TypeDictionaryDispatch[str(self.DataType)]()
+                        msg, thisType = PyPacket.TypeDispatch[str(self.DataType)]()
                         msg.ParseFromString(datastr)
                         # convert to json string
                         json_string = json_format.MessageToJson(msg)
