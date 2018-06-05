@@ -54,6 +54,7 @@ class SocketHandler(websocket.WebSocketHandler):
     '''
 
     def on_message(self, message):
+        #TODO! Look at the weather version to see how we fixed things
         command = message.split(",")[0]
         if command == "Start_Stream":
             #add this client to receive data updates
@@ -117,20 +118,7 @@ class PublishingThread(threading.Thread):
 
     #Change this loop
     def run(self):
-        '''
-        #Keep running until we want to shutdown
-        while not shutdown_event.is_set():
-            json_data = createTestJson()
-            if json_data:
-                #print json_data
-                if msg_cl:
-                    for c in msg_cl:
-                        print('Sent Message')
-                        c.write_message(json_data)
-            time.sleep(.5) 
-        '''
-        
-        #NEED TO STILL INITIALIZE THESE
+        #TODO!: NEED TO STILL INITIALIZE THESE
         lastTime = time.time() #size of frequency sets
         dTime = time.time() #size of frequency sets
         while not shutdown_event.is_set():
@@ -196,112 +184,7 @@ def ProcessFrequencySet(QueList):
 
 
 def createTestJson():
-    #Hard Code some json strings
-    #Msg4 Aircraft State
-    msg4 = PyPackets_pb2.AircraftPixhawkState()
-    msg4.packetNum = 1;
-    msg4.ID = "Test"
-    msg4.time = time.time()
-    msg4.LLA_Pos.x = 40.014984
-    msg4.LLA_Pos.y = -105.270546
-    msg4.LLA_Pos.z = 100 #AGL
-    msg4.velocity.x = 10
-    msg4.velocity.y = 0
-    msg4.velocity.z = 0
-    msg4.attitude.x = 0
-    msg4.attitude.y = 0
-    msg4.attitude.z = 0
-    msg4.airspeed = 15
-    msg4.mode = "IDK"
-    msg4.batteryStatus.current = 10
-    msg4.batteryStatus.voltage = 11.7
-    msg4.currentWaypoint.LLA_Pos.x = 40.000267
-    msg4.currentWaypoint.LLA_Pos.y = -105.100021
-    msg4.currentWaypoint.LLA_Pos.z = 100
-    #Msg3 NM Status
-    msg3 = PyPackets_pb2.NMStatus()
-    msg3.packetNum = 1
-    msg3.ID = "Test"
-    msg3.time = time.time()
-    msg3.numberOfMsgs = 10
-    msg3.avgTimeDelay = 5
-    msg3.totalMsgsRcv = 100
-    for i in range(3):
-        new = msg3.subs.add()
-        new.id = "sub"
-        new.datatype = "AC10"
-        new.port = 10000
-        new.address = "192.158.10.101"
-        new.msgfreq = 0.1
-
-    msg3.messagesInQue = 12
-    msg3.numberOfLocalSubscribers = 3
-    msg3.numberOfGlobalSubscribers = 0
-    #Msg2 RF Sensor
-    msg2 = PyPackets_pb2.RF_Data_Msg()
-    msg2.packetNum = 1
-    msg2.ID = "test"
-    msg2.time = time.time()
-    msg2.lla.x = 40.1
-    msg2.lla.y = 100.0
-    msg2.lla.z = 90
-    msg2.attitude.x = 0
-    msg2.attitude.y = 0
-    msg2.attitude.z = 0
-    msg2.airspeed = 1
-    for i in range(3):
-        new = msg2.rfNode.add()
-        new.chanID = "1"
-        new.rssi = 10
-        new.pl_msr = 5
-        new.pl_error = 0
-        new.xgridNum
-    #Msg1 RF Map
-    msg1 = PyPackets_pb2.RF_PL_Map_Msg()
-    msg1.packetNum = 1
-    msg1.ID = "test"
-    msg1.time = time.time()
-    msg1.gp_iteration_number = 1
-    msg1.xGrids = 1
-    msg1.yGrids = 1
-    msg1.xSpacing = 1
-    msg1.ySpacing = 1
-    for i in range(4):
-        new = msg1.cell.add()
-        new.xgridNum = 10
-        new.ygridNum = 15
-        new.est_path_loss = 5
-        new.path_loss_err = 1
-        new.pred_path_loss = 2
-    
-    msg1.centerPoint.x = 40.389
-    msg1.centerPoint.y = -105.39
-    msg1.centerPoint.z = 0
-    msg1.gp_learning_time = 10
-    msg1.gp_prediction_time = 12
-    msg1.bestLocation.LLA_Pos.x = 39.742043
-    msg1.bestLocation.LLA_Pos.y = -104.991531
-    msg1.bestLocation.LLA_Pos.z = 0
-    msg1.bestLocation.cost = 100
-    msg1.costFromA = 60
-    msg1.costFromB = 40
-
-    #Serialize and combine
-    json_string = json_format.MessageToJson(msg1)
-    dictOut = json.loads(json_string)
-    json_string = json_format.MessageToJson(msg2)
-    dictOut2 = json.loads(json_string)
-    json_string = json_format.MessageToJson(msg3)
-    dictOut3 = json.loads(json_string)
-    json_string = json_format.MessageToJson(msg4)
-    dictOut4 = json.loads(json_string)
-    
-    dictionaryNew = {}
-    dictionaryNew['AircraftPixhawkState'] = dictOut4
-    dictionaryNew['RF_PL_Map_Msg'] = dictOut
-    dictionaryNew['RF_Data_Msg'] = dictOut2
-    dictionaryNew['NMStatus'] = dictOut3
-    return json.dumps(dictionaryNew)
+    pass
 
 app = web.Application([
     (r'/', IndexHandler),
