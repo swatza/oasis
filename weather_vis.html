@@ -674,9 +674,9 @@
 			oStr += "<TH style=\"width:150px;\" nowrap>Altitude:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.LLAPos.z,2) + "</TD>"; //Altitude (ASL or AGL?)
 			oStr += "<TH style=\"width:150px;\" nowrap>Receiver Lat:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(tempdata.receiverLLAPos.x,4) + "</TD>"; //Receiver Lat
 			oStr += "</TR><TR>";
-			oStr += "<TH style=\"width:150px;\" nowrap>Vel X:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.x,2) + "</TD>"; // Latitude
-			oStr += "<TH style=\"width:150px;\" nowrap>Vel Y:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.y,2) + "</TD>"; // Longitude
-			oStr += "<TH style=\"width:150px;\" nowrap>Vel Z:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.z,2) + "</TD>"; //Altitude (ASL or AGL?)
+			oStr += "<TH style=\"width:150px;\" nowrap>Vel North:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.x,2) + "</TD>"; // Latitude
+			oStr += "<TH style=\"width:150px;\" nowrap>Vel East:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.y,2) + "</TD>"; // Longitude
+			oStr += "<TH style=\"width:150px;\" nowrap>Vel Down:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(balloon_data.Vel.z,2) + "</TD>"; //Altitude (ASL or AGL?)
 			oStr += "<TH style=\"width:150px;\" nowrap>Receiver Lon:</TH><TD class=\"zelle\" style=\" width:100px;\" nowrap>" + getFixed(tempdata.receiverLLAPos.y,4) + "</TD>"; //Receiver Lon
 			oStr += "</TR><TR>";
 			oStr += "<TH style=\"width:150px;\" nowrap>Pressure:</TH><TD class=\" zelle\" style=\"width:100px;\" nowrap>" + getFixed(balloon_data.pthsensor.pressure,2) + "</TD>"; //pressure
