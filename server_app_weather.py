@@ -19,6 +19,8 @@ import PyPacket
 import Server_Reader
 import PyPackets_pb2
 import PyPacketLogger
+import time
+import os
 # External Libs
 from google.protobuf import json_format
 
@@ -28,13 +30,15 @@ cl = []
 msg_cl = []
 shutdown_event = threading.Event()
 recording = False
-thefilename = "base.text"
+thefilename = time.strftime("%Y%m%d-%H%M%S")+'.txt'
+
 
 class IndexHandler(web.RequestHandler):
     def get(self):
         self.render("weather_vis.html")
 
 class SocketHandler(websocket.WebSocketHandler):
+    global recording
     def check_origin(self, origin):
         return True
 
@@ -50,8 +54,8 @@ class SocketHandler(websocket.WebSocketHandler):
             print 'Client Disconnected'
 
     def on_message(self, message):
+        global recording
         command = message.split(",")[0]
-        argument = message.split(",")[1]
         if command == "Start_Stream":
             # add this client to receive data updates
             msg_cl.append(self)
@@ -62,8 +66,10 @@ class SocketHandler(websocket.WebSocketHandler):
             print 'Removed client from streaming list'
         elif command == "StartSaving":
             # Start saving data to a log file
+            print ("Started Recording Data")
             recording = True
-            thefilename = argument
+            #argument = message.split(",")[1]
+            thefilename = "myfile.txt"
         elif command == "StopSaving":
             # Stop saving data to a log file
             recording = False
@@ -107,6 +113,7 @@ class PublishingThread(threading.Thread):
 
     # Change this loop
     def run(self):
+        global recording
         # NEED TO STILL INITIALIZE THESE
         lastTime = time.time()  # size of frequency sets
         dTime = time.time()  # size of frequency sets
@@ -114,15 +121,14 @@ class PublishingThread(threading.Thread):
         while not shutdown_event.is_set():
             # need to get the dT
             nowTime = time.time()
-            # for i in range(0,len(lastTime)):
-            #	dTime[i] = nowTime - lastTime[i]
-            dTime = nowTime - lastTime
-
             if lastRecordingStatus != recording:
                 if recording:
                     self.startDataRecording(thefilename)
                 else:
                     self.endDataRecording()
+            # for i in range(0,len(lastTime)):
+            #	dTime[i] = nowTime - lastTime[i]
+            dTime = nowTime - lastTime
 
             if (dTime >= 1):
                 json_data = ProcessFrequencySet(self.FrequencyQues)
@@ -131,7 +137,7 @@ class PublishingThread(threading.Thread):
                         for c in msg_cl:
                             c.write_message(json_data)
                             if recording:
-                                myrecordlog.write(json_data + '\n')
+                                self.myrecordlog.write(json_data + '\n')
                                 #write the json stuff to a file
                             print 'sent message'
                 # Now update the last time this frequency set was handled
@@ -140,7 +146,7 @@ class PublishingThread(threading.Thread):
         print 'Stopping Web Publishing Thread'
 
     def startDataRecording(self,filename):
-        self.myrecordlog = open(filename, 'w')
+        self.myrecordlog = open(filename, 'a')
         # we should look to see if this file already exists or something
         #also check if it is already open
 
